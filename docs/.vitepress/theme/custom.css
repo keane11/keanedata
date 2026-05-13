@@ -1,41 +1,73 @@
-/* 品牌主色：靛蓝 → 青色渐变 */
-:root {
+/* ── 默认主题：靛蓝 ── */
+:root,
+[data-theme='indigo'] {
   --vp-c-brand-1: #4f6ef7;
   --vp-c-brand-2: #3b5bdb;
   --vp-c-brand-3: #2f4ac7;
   --vp-c-brand-soft: rgba(79, 110, 247, 0.12);
-
-  /* 首页 hero 渐变背景 */
-  --vp-home-hero-name-color: transparent;
   --vp-home-hero-name-background: linear-gradient(120deg, #4f6ef7 20%, #00b4d8 80%);
-  --vp-home-hero-image-background-image: linear-gradient(
-    -45deg,
-    #4f6ef7 30%,
-    #00b4d8 70%
-  );
+}
+
+/* ── 翠绿 ── */
+[data-theme='green'] {
+  --vp-c-brand-1: #10b981;
+  --vp-c-brand-2: #059669;
+  --vp-c-brand-3: #047857;
+  --vp-c-brand-soft: rgba(16, 185, 129, 0.12);
+  --vp-home-hero-name-background: linear-gradient(120deg, #10b981 20%, #06b6d4 80%);
+}
+
+/* ── 玫红 ── */
+[data-theme='rose'] {
+  --vp-c-brand-1: #f43f5e;
+  --vp-c-brand-2: #e11d48;
+  --vp-c-brand-3: #be123c;
+  --vp-c-brand-soft: rgba(244, 63, 94, 0.12);
+  --vp-home-hero-name-background: linear-gradient(120deg, #f43f5e 20%, #fb923c 80%);
+}
+
+/* ── 暖橙 ── */
+[data-theme='orange'] {
+  --vp-c-brand-1: #f97316;
+  --vp-c-brand-2: #ea580c;
+  --vp-c-brand-3: #c2410c;
+  --vp-c-brand-soft: rgba(249, 115, 22, 0.12);
+  --vp-home-hero-name-background: linear-gradient(120deg, #f97316 20%, #facc15 80%);
+}
+
+/* ── 紫罗兰 ── */
+[data-theme='purple'] {
+  --vp-c-brand-1: #8b5cf6;
+  --vp-c-brand-2: #7c3aed;
+  --vp-c-brand-3: #6d28d9;
+  --vp-c-brand-soft: rgba(139, 92, 246, 0.12);
+  --vp-home-hero-name-background: linear-gradient(120deg, #8b5cf6 20%, #ec4899 80%);
+}
+
+/* ── 首页 hero 渐变文字 ── */
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #4f6ef7 30%, #00b4d8 70%);
   --vp-home-hero-image-filter: blur(44px);
 }
 
-/* 暗色模式下微调亮度 */
+/* 暗色模式亮度微调 */
 .dark {
-  --vp-c-brand-1: #7b97fa;
-  --vp-c-brand-2: #4f6ef7;
-  --vp-c-brand-3: #3b5bdb;
-  --vp-c-brand-soft: rgba(123, 151, 250, 0.14);
+  --vp-c-brand-1: color-mix(in srgb, var(--vp-c-brand-1) 80%, white);
 }
 
-/* 导航栏底部细线，增加层次感 */
+/* ── 导航栏底部线 ── */
 .VPNav {
   border-bottom: 1px solid var(--vp-c-divider) !important;
 }
 
-/* 代码块：圆角 + 细线边框 */
+/* ── 代码块 ── */
 div[class*='language-'] {
   border-radius: 10px !important;
   border: 1px solid var(--vp-c-divider);
 }
 
-/* 行内代码：轻背景 */
+/* ── 行内代码 ── */
 :not(pre) > code {
   background-color: var(--vp-c-brand-soft) !important;
   color: var(--vp-c-brand-1) !important;
@@ -43,16 +75,16 @@ div[class*='language-'] {
   padding: 2px 6px;
 }
 
-/* 首页 feature 卡片：hover 上浮 */
+/* ── feature 卡片 hover ── */
 .VPFeature {
   transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 .VPFeature:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(79, 110, 247, 0.15);
+  box-shadow: 0 8px 24px var(--vp-c-brand-soft);
 }
 
-/* 表格：条纹 + 边框 */
+/* ── 表格 ── */
 .vp-doc table {
   display: table;
   width: 100%;
@@ -73,7 +105,7 @@ div[class*='language-'] {
   padding: 10px 14px;
 }
 
-/* 引用块：左侧品牌色竖线 */
+/* ── 引用块 ── */
 .vp-doc blockquote {
   border-left: 4px solid var(--vp-c-brand-1);
   background-color: var(--vp-c-brand-soft);
@@ -81,7 +113,7 @@ div[class*='language-'] {
   padding: 12px 16px;
 }
 
-/* 文章内容最大宽度，阅读更舒适 */
+/* ── 文章宽度 ── */
 .vp-doc {
   max-width: 780px;
 }
