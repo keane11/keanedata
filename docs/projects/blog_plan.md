@@ -1,5 +1,5 @@
 ---
-title: keaneai.top 个人博客搭建方案
+title: keaneai个人博客搭建方案
 ---
 
 # keaneai.top 个人博客搭建方案
