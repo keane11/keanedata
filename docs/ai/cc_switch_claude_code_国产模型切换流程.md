@@ -1,4 +1,4 @@
-# CC Switch
+# CC Switch 与 Claude Code使用deepseek模型
 
 本文档记录在 **Windows + WSL Ubuntu-22.04** 环境下安装 **CC Switch**，并通过 CC Switch 给 **Claude Code CLI** 切换到国产大模型，例如 DeepSeek API 的完整流程。
 
