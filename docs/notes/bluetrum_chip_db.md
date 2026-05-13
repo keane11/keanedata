@@ -1,3 +1,11 @@
+---
+title: 中科蓝讯（Bluetrum）芯片数据库
+description: 中科蓝讯 AB89X/AB896X 系列芯片选型参数速查表，含音频 SoC 型号对比
+date: 2026-05-11
+tags: [嵌入式, 芯片]
+order: 8
+---
+
 # 中科蓝讯（Bluetrum）芯片数据库
 
 > 来源：中科蓝讯选型表_v6.3-20260331

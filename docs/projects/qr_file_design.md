@@ -1,5 +1,9 @@
 ---
 title: QR 共享文件夹设计方案
+description: QR 文件共享服务详细设计：权限模型、API 设计、数据库 Schema、WSL2 部署与 Cloudflare Tunnel 配置
+date: 2026-05-13
+tags: [FastAPI, 项目, 设计文档]
+order: 2
 ---
 
 # QR 共享文件夹 — 设计方案

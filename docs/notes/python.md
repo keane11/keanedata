@@ -1,3 +1,11 @@
+---
+title: Python 笔记
+description: Python 语法技巧速查：推导式、解包、装饰器、类型注解、虚拟环境管理
+date: 2026-05-13
+tags: [Python]
+order: 1
+---
+
 # Python 笔记
 
 ## 常用内置技巧

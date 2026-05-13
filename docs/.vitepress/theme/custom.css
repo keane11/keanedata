@@ -127,3 +127,23 @@ div[class*='language-'] {
 .vp-doc .header-anchor {
   display: none;
 }
+
+/* ── 阅读进度条（scroll-driven animation，现代浏览器） ── */
+@supports (animation-timeline: scroll()) {
+  .VPDoc::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--vp-c-brand-1);
+    transform-origin: left;
+    animation: reading-progress linear both;
+    animation-timeline: scroll(root);
+    z-index: 9999;
+    pointer-events: none;
+  }
+  @keyframes reading-progress {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+}

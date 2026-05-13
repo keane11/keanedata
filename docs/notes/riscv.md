@@ -1,5 +1,9 @@
 ---
 title: RISC-V 嵌入式开发笔记
+description: RISC-V 架构速查：ISA 扩展、ABI 寄存器、CSR 操作、Trap 处理、常用 MCU 对比与工具链配置
+date: 2026-05-13
+tags: [嵌入式, RISC-V]
+order: 7
 ---
 
 # RISC-V 嵌入式开发笔记

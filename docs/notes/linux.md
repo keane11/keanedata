@@ -1,3 +1,11 @@
+---
+title: Linux 笔记
+description: Linux 系统管理速查：文件操作、进程管理、网络诊断、Systemd 服务配置
+date: 2026-05-13
+tags: [Linux]
+order: 3
+---
+
 # Linux 笔记
 
 ## 文件与目录

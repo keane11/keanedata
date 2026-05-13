@@ -1,7 +1,9 @@
 ---
 title: Hermes Agent 完整配置指南
+description: Hermes Agent 部署指南：DeepSeek 主力 + 微信 Gateway + Gemini 备选，WSL2 环境完整配置
 date: 2026-05-13
-order: 5
+tags: [AI, Agent, DeepSeek]
+order: 6
 ---
 
 # Hermes Agent 完整配置指南

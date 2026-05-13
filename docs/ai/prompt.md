@@ -1,3 +1,11 @@
+---
+title: 提示词工程指南
+description: 写好 Prompt 的核心方法论：角色、任务、约束三要素与常用模板，适用于所有主流大模型
+date: 2026-05-13
+tags: [AI, Prompt]
+order: 7
+---
+
 # 提示词工程指南
 
 > 写好提示词（Prompt）是用好 AI 的核心技能，适用于 Claude、GPT、Gemini 等所有大模型。

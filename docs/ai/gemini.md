@@ -1,3 +1,11 @@
+---
+title: Gemini 使用指南
+description: Google Gemini 使用指南，含 Gemini CLI 安装配置和超长上下文实战技巧
+date: 2026-05-13
+tags: [AI, Gemini]
+order: 3
+---
+
 # Gemini 使用指南
 
 > Google DeepMind 出品，深度整合 Google 搜索和 Workspace 生态。

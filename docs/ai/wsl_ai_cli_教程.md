@@ -1,3 +1,11 @@
+---
+title: WSL 安装 AI CLI 工具完整教程
+description: Windows WSL2 + Ubuntu 环境下安装 Claude Code、Codex CLI、Gemini CLI 完整教程
+date: 2026-04-21
+tags: [WSL, CLI, AI]
+order: 4
+---
+
 # WSL + Ubuntu 安装 AI CLI 工具完整教程
 
 > 适用环境：Windows 10 (2004+) / Windows 11 + WSL 2 + Ubuntu 24.04 LTS  

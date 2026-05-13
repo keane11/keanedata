@@ -1,5 +1,9 @@
 ---
 title: C 语言嵌入式开发笔记
+description: 嵌入式 C 开发速查：位操作宏、volatile 用法、内存映射寄存器、环形缓冲区、状态机与 RISC-V/Cortex-M 临界区
+date: 2026-05-13
+tags: [嵌入式, C语言]
+order: 5
 ---
 
 # C 语言嵌入式开发笔记

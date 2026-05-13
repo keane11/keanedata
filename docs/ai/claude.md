@@ -1,3 +1,11 @@
+---
+title: Claude 使用指南
+description: Anthropic Claude 使用指南，含 Claude Code CLI 深度教程、MCP 服务器配置与 Hooks 自动化
+date: 2026-05-13
+tags: [AI, Claude]
+order: 1
+---
+
 # Claude 使用指南
 
 > Anthropic 出品的 AI 助手，在长文本处理、代码编写和逻辑推理方面表现出色。

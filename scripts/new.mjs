@@ -30,7 +30,9 @@ const title = slug.charAt(0).toUpperCase() + slug.slice(1)
 
 const template = `---
 title: ${title}
+description:
 date: ${date}
+tags: []
 order: 99
 ---
 

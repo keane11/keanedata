@@ -1,5 +1,9 @@
 ---
-title: keaneai个人博客搭建方案
+title: keaneai.top 博客搭建方案
+description: keaneai.top 博客架构说明：VitePress + GitHub Pages + GitHub Actions + Admin Panel 完整搭建方案
+date: 2026-05-13
+tags: [VitePress, 博客, 项目]
+order: 4
 ---
 
 # keaneai.top 个人博客搭建方案

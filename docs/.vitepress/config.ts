@@ -23,23 +23,49 @@ export default defineConfig({
   description: 'AI 平台配置 · 编程笔记 · 项目实战',
   lang: 'zh-CN',
   ignoreDeadLinks: true,
+  lastUpdated: true,
+
+  sitemap: {
+    hostname: 'https://www.keaneai.top',
+  },
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
+    ['meta', { name: 'theme-color', content: '#4f6ef7' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:site_name', content: 'Keane 的技术笔记' }],
+    ['meta', { name: 'twitter:card', content: 'summary' }],
   ],
 
   themeConfig: {
     logo: '/favicon.svg',
 
     nav: [
-      { text: '首页',   link: '/' },
+      { text: '首页',     link: '/' },
       { text: 'AI 平台',  link: '/ai/' },
       { text: '编程笔记', link: '/notes/' },
       { text: '项目实战', link: '/projects/' },
-      { text: '文件共享', link: 'https://share.keaneai.top', target: '_blank' },
+      {
+        text: '工具',
+        items: [
+          { text: '📁 文件共享', link: '/tools/share' },
+        ],
+      },
     ],
 
-    sidebar,
+    sidebar: {
+      ...sidebar,
+      '/tools/': [
+        {
+          text: '工具',
+          items: [
+            { text: '文件共享', link: '/tools/share' },
+          ],
+        },
+      ],
+    },
+
+    externalLinkIcon: true,
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/keane11' },
@@ -49,9 +75,22 @@ export default defineConfig({
       provider: 'local',
     },
 
+    lastUpdated: {
+      text: '最后更新',
+      formatOptions: { dateStyle: 'short', timeStyle: 'short' },
+    },
+
+    notFound: {
+      title: '页面不见了',
+      quote: '链接可能已失效，或页面已被移动。',
+      linkLabel: '返回首页',
+      linkText: '← 返回首页',
+      code: '404',
+    },
+
     footer: {
       message: '用 VitePress 构建',
-      copyright: 'Copyright © 2025 Keane',
+      copyright: 'Copyright © 2026 Keane',
     },
 
     outline: {
@@ -63,5 +102,7 @@ export default defineConfig({
       prev: '上一篇',
       next: '下一篇',
     },
+
+    returnToTopLabel: '回到顶部',
   },
 })

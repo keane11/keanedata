@@ -1,5 +1,9 @@
 ---
 title: FreeRTOS 开发笔记
+description: FreeRTOS 完整指南：任务、队列、信号量、事件组、任务通知、软件定时器与堆内存配置
+date: 2026-05-13
+tags: [嵌入式, FreeRTOS, RTOS]
+order: 6
 ---
 
 # FreeRTOS 开发笔记

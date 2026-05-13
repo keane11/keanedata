@@ -1,3 +1,11 @@
+---
+title: Git 笔记
+description: Git 日常命令速查：分支管理、提交规范、历史查找与 reflog 救援
+date: 2026-05-13
+tags: [Git]
+order: 4
+---
+
 # Git 笔记
 
 ## 日常操作速查

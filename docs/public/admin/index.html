@@ -173,6 +173,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
           title="修改这里即可改变文章在博客侧边栏和页面中显示的名称">
         <label style="font-size:12px;color:var(--muted);margin-bottom:0;white-space:nowrap">排序</label>
         <input id="order-input" type="number" class="toolbar-input" placeholder="99" min="1" max="999" title="数字越小越靠前">
+        <input id="desc-input" type="text" class="toolbar-input" placeholder="文章简介（description，≤120字）" style="flex:3;min-width:180px">
+        <input id="tags-input" type="text" class="toolbar-input" placeholder="标签（逗号分隔，如：AI, Python）" style="flex:2;min-width:120px">
+        <input id="date-input" type="date" class="toolbar-input" style="width:140px;flex:0">
         <input id="commit-msg" type="text" class="toolbar-input" placeholder="提交说明（留空自动生成）">
         <button class="btn-p btn-sm" id="save-btn" onclick="saveFile()">保存发布</button>
         <button class="btn-d btn-sm" id="del-btn" onclick="deleteFile()">删除</button>
@@ -443,6 +446,10 @@ function loadEditor(path,sha,content,showOrder){
   // order
   document.getElementById('order-input').style.display=showOrder?'':'none'
   if(showOrder) document.getElementById('order-input').value=fm.order||''
+  // description / tags / date
+  document.getElementById('desc-input').value=fm.description||''
+  const rawTags=fm.tags||'';document.getElementById('tags-input').value=rawTags.replace(/^\[|\]$/g,'')
+  document.getElementById('date-input').value=fm.date||''
   document.getElementById('del-btn').style.display=showOrder?'':'none'
   renderPreview()
   document.getElementById('toolbar').style.display='flex'
@@ -488,6 +495,13 @@ async function saveFile(){
   if(orderInput.style.display!=='none'&&orderInput.value){
     content=setFrontmatterOrder(content,orderInput.value)
   }
+  // update description, tags, date
+  const descVal=document.getElementById('desc-input').value.trim()
+  if(descVal) content=setFrontmatterField(content,'description',descVal)
+  const tagsVal=document.getElementById('tags-input').value.trim()
+  if(tagsVal){const arr=tagsVal.split(',').map(t=>t.trim()).filter(Boolean);content=setFrontmatterField(content,'tags','['+arr.join(', ')+']')}
+  const dateVal=document.getElementById('date-input').value
+  if(dateVal) content=setFrontmatterField(content,'date',dateVal)
   document.getElementById('editor').value=content
 
   // ── 分区迁移判断 ──

@@ -1,3 +1,11 @@
+---
+title: OpenAI 使用指南
+description: OpenAI GPT 系列使用指南，含 Codex CLI 审批模式配置和自动化工作流实战
+date: 2026-05-13
+tags: [AI, OpenAI]
+order: 2
+---
+
 # OpenAI 使用指南
 
 > GPT 系列模型，应用生态最为丰富，插件和第三方集成众多。
