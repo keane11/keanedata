@@ -162,9 +162,14 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div class="editor-area">
       <div class="editor-toolbar" id="toolbar" style="display:none">
         <span class="path-badge" id="path-badge"></span>
+        <select id="section-select" class="toolbar-input" title="移动到其他分区" style="flex:0;width:auto">
+          <option value="ai">AI 平台</option>
+          <option value="notes">编程笔记</option>
+          <option value="projects">项目实战</option>
+        </select>
         <input id="title-input" type="text" class="toolbar-input"
-          placeholder="博客显示标题（修改后保存生效）"
-          style="flex:2;min-width:150px;font-weight:500"
+          placeholder="博客显示标题"
+          style="flex:2;min-width:140px;font-weight:500"
           title="修改这里即可改变文章在博客侧边栏和页面中显示的名称">
         <label style="font-size:12px;color:var(--muted);margin-bottom:0;white-space:nowrap">排序</label>
         <input id="order-input" type="number" class="toolbar-input" placeholder="99" min="1" max="999" title="数字越小越靠前">
@@ -263,6 +268,7 @@ const PAGES={
 }
 const STORE_KEY='blog_admin_enc'
 let token='', curPath='', curSha='', uploadContent=''
+const titleCache={}   // path → frontmatter title，用于侧边栏刷新后保留标题
 
 // ── Crypto ────────────────────────────────────────────────────────────
 async function deriveKey(pw, salt){
@@ -369,9 +375,10 @@ async function loadList(){
     html+=`<div class="sec-title"><span>${sec.label}</span></div>`
     if(!files.length) html+=`<div style="padding:3px 14px 6px;font-size:12px;color:var(--muted)">暂无文章</div>`
     for(const f of files){
-      const raw=f.name.replace('.md','')
-      const display=raw.replace(/_/g,' ').replace(/-/g,' ')
-      html+=`<div class="file-item" data-path="${sec.path}/${f.name}" data-sha="${f.sha}"
+      const fpath=`${sec.path}/${f.name}`
+      const raw=f.name.replace(/\.md$/,'')
+      const display=titleCache[fpath]||raw.replace(/_/g,' ').replace(/-/g,' ')
+      html+=`<div class="file-item" data-path="${fpath}" data-sha="${f.sha}"
         onclick="openFile(this)" title="${f.name}">📄 <span class="file-name">${display}</span></div>`
     }
   }
@@ -417,8 +424,20 @@ function loadEditor(path,sha,content,showOrder){
   document.getElementById('path-badge').textContent=path
   document.getElementById('commit-msg').value=''
   const fm=parseFrontmatter(content)
-  // title
-  document.getElementById('title-input').value=fm.title||''
+  // title：有 frontmatter title 用它，否则用文件名做建议值
+  const fileName=path.split('/').pop().replace(/\.md$/,'')
+  const titleVal=fm.title||fileName.replace(/_/g,' ').replace(/-/g,' ')
+  document.getElementById('title-input').value=titleVal
+  // 更新 titleCache 和侧边栏当前项
+  titleCache[path]=titleVal
+  document.querySelectorAll('.file-item').forEach(i=>{
+    if(i.dataset.path===path){const fn=i.querySelector('.file-name');if(fn)fn.textContent=titleVal}
+  })
+  // section select
+  const secKey=Object.keys(SECTIONS).find(k=>path.startsWith(SECTIONS[k].path+'/'))
+  const secSel=document.getElementById('section-select')
+  secSel.style.display=showOrder&&secKey?'':'none'
+  if(secKey)secSel.value=secKey
   // order
   document.getElementById('order-input').style.display=showOrder?'':'none'
   if(showOrder) document.getElementById('order-input').value=fm.order||''
@@ -467,27 +486,54 @@ async function saveFile(){
     content=setFrontmatterOrder(content,orderInput.value)
   }
   document.getElementById('editor').value=content
-  const msg=document.getElementById('commit-msg').value.trim()||`docs: update ${curPath.split('/').pop()}`
-  setStatus('提交中…','info')
+
+  // ── 分区迁移判断 ──
+  const secSel=document.getElementById('section-select')
+  const newKey=secSel.style.display!=='none'?secSel.value:null
+  const oldKey=newKey?Object.keys(SECTIONS).find(k=>curPath.startsWith(SECTIONS[k].path+'/')):'none'
+  const moving=newKey&&oldKey&&newKey!==oldKey
+  const fileName=curPath.split('/').pop()
+  const targetPath=moving?`${SECTIONS[newKey].path}/${fileName}`:curPath
+
+  const msg=document.getElementById('commit-msg').value.trim()||
+    (moving?`docs: move ${fileName} → ${SECTIONS[newKey].label}`:`docs: update ${fileName}`)
+  setStatus(moving?'迁移中…':'提交中…','info')
+
   const body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:BRANCH}
-  if(curSha)body.sha=curSha
-  const r=await api(`contents/${curPath}`,'PUT',body)
-  btn.disabled=false
-  if(r.ok){
-    const d=await r.json();curSha=d.content.sha
-    await loadList()
-    // re-highlight active file and update its sidebar label with the saved title
-    document.querySelectorAll('.file-item').forEach(i=>{
-      if(i.dataset.path===curPath){
-        i.classList.add('active')
-        if(titleVal){const fn=i.querySelector('.file-name');if(fn)fn.textContent=titleVal}
-      }
-    })
-    setStatus(`✓ 已发布：${msg}`,'ok')
-  }else{
+  // 原路径保存用 curSha；迁移时目标为新文件不附 sha
+  if(!moving&&curSha)body.sha=curSha
+
+  const r=await api(`contents/${targetPath}`,'PUT',body)
+  if(!r.ok){
     const e=await r.json().catch(()=>({}))
     setStatus('保存失败：'+(e.message||r.status),'err')
+    btn.disabled=false;return
   }
+  const d=await r.json()
+  const newSha=d.content.sha
+
+  // 迁移成功后删除旧文件
+  if(moving){
+    await api(`contents/${curPath}`,'DELETE',{
+      message:`docs: remove ${fileName} (moved to ${SECTIONS[newKey].label})`,
+      sha:curSha,branch:BRANCH
+    })
+    delete titleCache[curPath]
+  }
+
+  curPath=targetPath; curSha=newSha
+  document.getElementById('path-badge').textContent=curPath
+  if(titleVal) titleCache[curPath]=titleVal
+
+  await loadList()
+  document.querySelectorAll('.file-item').forEach(i=>{
+    if(i.dataset.path===curPath){
+      i.classList.add('active')
+      if(titleVal){const fn=i.querySelector('.file-name');if(fn)fn.textContent=titleVal}
+    }
+  })
+  setStatus(`✓ 已发布：${msg}`,'ok')
+  btn.disabled=false
 }
 
 // ── Delete ────────────────────────────────────────────────────────────
