@@ -47,7 +47,14 @@ export default defineConfig({
       { text: '项目实战', link: '/projects/' },
       {
         text: '工具',
+        link: '/tools/',
         items: [
+          { text: '🔲 QR 码生成器', link: '/tools/qrcode' },
+          { text: '#  Hash 计算器', link: '/tools/hash' },
+          { text: '✨ Prompt 构建器', link: '/tools/prompt' },
+          { text: '📄 Base64 编解码', link: '/tools/base64' },
+          { text: '{}  JSON 格式化', link: '/tools/json' },
+          { text: '⏱  时间戳转换', link: '/tools/timestamp' },
           { text: '📁 文件共享', link: '/tools/share' },
         ],
       },
@@ -57,7 +64,23 @@ export default defineConfig({
       ...sidebar,
       '/tools/': [
         {
-          text: '工具',
+          text: '开发工具',
+          items: [
+            { text: 'QR 码生成器', link: '/tools/qrcode' },
+            { text: 'Hash 计算器', link: '/tools/hash' },
+            { text: 'Base64 编解码', link: '/tools/base64' },
+            { text: 'JSON 格式化', link: '/tools/json' },
+            { text: '时间戳转换', link: '/tools/timestamp' },
+          ],
+        },
+        {
+          text: 'AI 辅助',
+          items: [
+            { text: 'Prompt 构建器', link: '/tools/prompt' },
+          ],
+        },
+        {
+          text: '服务',
           items: [
             { text: '文件共享', link: '/tools/share' },
           ],
