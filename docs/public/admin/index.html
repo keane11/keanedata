@@ -5,169 +5,190 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>博客管理后台</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #f8f9fa; --surface: #fff; --border: #e1e4e8;
-    --brand: #4f6ef7; --brand-hover: #3b5bdb;
-    --text: #24292f; --muted: #656d76;
-    --danger: #cf222e; --success: #1a7f37;
-  }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg); color: var(--text); min-height: 100vh; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f8fa;--surface:#fff;--border:#d0d7de;
+  --brand:#4f6ef7;--brand-hover:#3b5bdb;--brand-soft:rgba(79,110,247,.1);
+  --text:#1f2328;--muted:#636c76;--danger:#d1242f;--success:#1a7f37;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
 
-  /* ── Login ── */
-  #login { display: flex; align-items: center; justify-content: center;
-    min-height: 100vh; }
-  .login-card { background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 40px; width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
-  .login-card h1 { font-size: 22px; margin-bottom: 6px; }
-  .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-  .login-card a { color: var(--brand); }
+/* login */
+#login{flex:1;display:flex;align-items:center;justify-content:center}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:36px;width:400px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.card h1{font-size:20px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:20px}
+.card a{color:var(--brand)}
+.card input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;
+  font-size:14px;outline:none;margin-bottom:10px}
+.card input:focus{border-color:var(--brand)}
+.err{color:var(--danger);font-size:13px;margin-top:8px;min-height:18px}
 
-  /* ── App shell ── */
-  #app { display: none; height: 100vh; flex-direction: column; }
-  .topbar { background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 12px; }
-  .topbar h1 { font-size: 16px; font-weight: 600; flex: 1; }
-  .main { display: flex; flex: 1; overflow: hidden; }
+/* app */
+#app{display:none;flex:1;flex-direction:column;overflow:hidden}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);
+  height:50px;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:600;flex:1}
+.wrap{display:flex;flex:1;overflow:hidden}
 
-  /* ── Sidebar ── */
-  .sidebar { width: 240px; border-right: 1px solid var(--border); background: var(--surface);
-    overflow-y: auto; padding: 12px 0; flex-shrink: 0; }
-  .sidebar-section { margin-bottom: 4px; }
-  .sidebar-section-title { padding: 6px 16px; font-size: 11px; font-weight: 600;
-    text-transform: uppercase; color: var(--muted); letter-spacing: .6px; }
-  .sidebar-item { display: flex; align-items: center; padding: 6px 16px; font-size: 13px;
-    cursor: pointer; border-radius: 0; gap: 8px; white-space: nowrap; overflow: hidden;
-    text-overflow: ellipsis; }
-  .sidebar-item:hover { background: var(--bg); }
-  .sidebar-item.active { background: rgba(79,110,247,.1); color: var(--brand); font-weight: 500; }
-  .sidebar-new { margin: 8px 12px 0; }
+/* sidebar */
+.sidebar{width:230px;background:var(--surface);border-right:1px solid var(--border);
+  overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-actions{padding:10px;border-bottom:1px solid var(--border);display:flex;gap:6px}
+.file-list{flex:1;overflow-y:auto;padding:8px 0}
+.sec-title{padding:6px 14px;font-size:11px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.file-item{display:flex;align-items:center;padding:6px 14px;font-size:13px;
+  cursor:pointer;gap:6px;overflow:hidden}
+.file-item:hover{background:var(--bg)}
+.file-item.active{background:var(--brand-soft);color:var(--brand);font-weight:500}
+.file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* ── Editor area ── */
-  .editor-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .editor-toolbar { padding: 10px 16px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px; background: var(--surface); }
-  .editor-toolbar input { flex: 1; border: 1px solid var(--border); border-radius: 6px;
-    padding: 6px 10px; font-size: 14px; outline: none; }
-  .editor-toolbar input:focus { border-color: var(--brand); }
-  .editor-panes { display: flex; flex: 1; overflow: hidden; }
-  textarea { flex: 1; border: none; border-right: 1px solid var(--border); padding: 16px;
-    font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 14px; line-height: 1.7;
-    resize: none; outline: none; background: #fafbfc; color: var(--text); }
-  .preview { flex: 1; overflow-y: auto; padding: 16px 24px; }
-  .empty-state { flex: 1; display: flex; align-items: center; justify-content: center;
-    color: var(--muted); flex-direction: column; gap: 12px; }
+/* editor */
+.editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.editor-toolbar{padding:8px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;background:var(--surface);flex-shrink:0}
+.editor-toolbar input{flex:1;border:1px solid var(--border);border-radius:6px;
+  padding:6px 10px;font-size:13px;outline:none}
+.editor-toolbar input:focus{border-color:var(--brand)}
+.path-badge{font-size:12px;color:var(--muted);min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.panes{display:flex;flex:1;overflow:hidden}
+textarea{flex:1;border:none;border-right:1px solid var(--border);
+  padding:16px;font-family:'Cascadia Code','Fira Code',monospace;
+  font-size:13.5px;line-height:1.75;resize:none;outline:none;
+  background:#fafbfc;color:var(--text);overflow-y:auto}
+.preview{flex:1;overflow-y:auto;padding:16px 24px}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;color:var(--muted);gap:10px;font-size:14px}
 
-  /* ── Buttons ── */
-  button { cursor: pointer; border: none; border-radius: 6px; font-size: 14px;
-    padding: 7px 14px; font-weight: 500; transition: background .15s; }
-  .btn-primary { background: var(--brand); color: #fff; }
-  .btn-primary:hover { background: var(--brand-hover); }
-  .btn-secondary { background: var(--bg); border: 1px solid var(--border); color: var(--text); }
-  .btn-secondary:hover { background: #eaecef; }
-  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
-  .btn-danger:hover { background: #fff0ee; }
-  .btn-sm { padding: 4px 10px; font-size: 12px; }
-  .btn-full { width: 100%; }
+/* status */
+.statusbar{height:26px;padding:0 14px;display:flex;align-items:center;
+  font-size:12px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.statusbar.ok{color:var(--success)}.statusbar.err{color:var(--danger)}.statusbar.info{color:var(--muted)}
 
-  /* ── Status bar ── */
-  .statusbar { padding: 6px 16px; font-size: 12px; border-top: 1px solid var(--border);
-    background: var(--surface); min-height: 30px; }
-  .statusbar.ok { color: var(--success); }
-  .statusbar.err { color: var(--danger); }
-  .statusbar.info { color: var(--muted); }
+/* buttons */
+button{cursor:pointer;border:none;border-radius:6px;font-size:13px;
+  padding:6px 12px;font-weight:500;transition:background .15s,opacity .15s}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn-p{background:var(--brand);color:#fff}
+.btn-p:hover:not(:disabled){background:var(--brand-hover)}
+.btn-s{background:var(--bg);border:1px solid var(--border);color:var(--text)}
+.btn-s:hover:not(:disabled){background:#eaecef}
+.btn-d{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn-d:hover:not(:disabled){background:#fff0ee}
+.btn-sm{padding:4px 9px;font-size:12px}
+.btn-full{width:100%;margin-top:4px}
 
-  /* ── New file dialog ── */
-  .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4);
-    display: none; align-items: center; justify-content: center; z-index: 100; }
-  .dialog-overlay.open { display: flex; }
-  .dialog { background: var(--surface); border-radius: 10px; padding: 24px;
-    width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,.15); }
-  .dialog h3 { margin-bottom: 16px; }
-  .dialog label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px; }
-  .dialog select, .dialog input[type=text] { width: 100%; border: 1px solid var(--border);
-    border-radius: 6px; padding: 8px 10px; font-size: 14px; outline: none; margin-bottom: 12px; }
-  .dialog select:focus, .dialog input[type=text]:focus { border-color: var(--brand); }
+/* dialog */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);
+  display:none;align-items:center;justify-content:center;z-index:200}
+.overlay.open{display:flex}
+.dialog{background:var(--surface);border-radius:10px;padding:24px;
+  width:380px;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.dialog h3{font-size:16px;margin-bottom:16px}
+.dialog label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+.dialog select,.dialog input[type=text]{width:100%;border:1px solid var(--border);
+  border-radius:6px;padding:8px 10px;font-size:13px;outline:none;margin-bottom:12px}
+.dialog select:focus,.dialog input[type=text]:focus{border-color:var(--brand)}
+.dialog-footer{display:flex;gap:8px;margin-top:8px}
 
-  /* ── Markdown preview styles ── */
-  .preview h1,.preview h2,.preview h3 { margin: 1em 0 .4em; line-height: 1.3; }
-  .preview h1 { font-size: 1.8em; } .preview h2 { font-size: 1.4em; }
-  .preview p { margin-bottom: .8em; line-height: 1.7; }
-  .preview code { background: rgba(79,110,247,.1); color: var(--brand); padding: 2px 6px;
-    border-radius: 4px; font-size: .9em; }
-  .preview pre { background: #1e1e2e; color: #cdd6f4; padding: 14px; border-radius: 8px;
-    overflow-x: auto; margin-bottom: .8em; }
-  .preview pre code { background: none; color: inherit; padding: 0; }
-  .preview table { border-collapse: collapse; width: 100%; margin-bottom: .8em; }
-  .preview th { background: rgba(79,110,247,.1); }
-  .preview th, .preview td { border: 1px solid var(--border); padding: 8px 12px; font-size: 14px; }
-  .preview blockquote { border-left: 4px solid var(--brand); background: rgba(79,110,247,.07);
-    padding: 10px 14px; border-radius: 0 6px 6px 0; margin-bottom: .8em; }
-  .preview ul, .preview ol { padding-left: 1.4em; margin-bottom: .8em; }
-  .preview li { margin-bottom: .3em; line-height: 1.6; }
-  .preview hr { border: none; border-top: 1px solid var(--border); margin: 1.2em 0; }
+/* upload drop zone */
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:24px;
+  text-align:center;cursor:pointer;color:var(--muted);font-size:13px;
+  transition:border-color .2s,background .2s;margin-bottom:12px}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--brand);background:var(--brand-soft)}
+.upload-zone input{display:none}
+.upload-zone p{margin-top:6px;font-size:12px}
+
+/* md preview */
+.preview h1,.preview h2,.preview h3{margin:1em 0 .4em;line-height:1.3}
+.preview h1{font-size:1.7em}.preview h2{font-size:1.35em}.preview h3{font-size:1.1em}
+.preview p{margin-bottom:.8em;line-height:1.7}
+.preview code{background:var(--brand-soft);color:var(--brand);
+  padding:2px 5px;border-radius:4px;font-size:.88em}
+.preview pre{background:#1e1e2e;color:#cdd6f4;padding:14px;
+  border-radius:8px;overflow-x:auto;margin-bottom:.8em}
+.preview pre code{background:none;color:inherit;padding:0}
+.preview table{border-collapse:collapse;width:100%;margin-bottom:.8em;font-size:14px}
+.preview th{background:var(--brand-soft);font-weight:600}
+.preview th,.preview td{border:1px solid var(--border);padding:7px 12px}
+.preview tr:nth-child(even){background:var(--bg)}
+.preview blockquote{border-left:4px solid var(--brand);background:var(--brand-soft);
+  padding:10px 14px;border-radius:0 6px 6px 0;margin-bottom:.8em}
+.preview ul,.preview ol{padding-left:1.4em;margin-bottom:.8em}
+.preview li{margin-bottom:.3em;line-height:1.6}
+.preview hr{border:none;border-top:1px solid var(--border);margin:1.2em 0}
+.preview a{color:var(--brand)}
 </style>
 </head>
 <body>
 
 <!-- Login -->
 <div id="login">
-  <div class="login-card">
+  <div class="card">
     <h1>博客管理后台</h1>
     <p>输入 GitHub Personal Access Token 登录。<br>
       需要 <code>repo</code> + <code>workflow</code> 权限。<br>
-      <a href="https://github.com/settings/tokens/new" target="_blank">生成 Token →</a>
+      <a href="https://github.com/settings/tokens/new" target="_blank">点此生成 Token →</a>
     </p>
-    <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx"
-      style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;
-             font-size:14px;outline:none;margin-bottom:12px;">
-    <button class="btn-primary btn-full" onclick="login()">登录</button>
-    <div id="login-err" style="color:var(--danger);font-size:13px;margin-top:10px;"></div>
+    <input id="tok" type="password" placeholder="ghp_xxxxxxxxxxxxxxxx">
+    <button class="btn-p btn-full" onclick="login()">登录</button>
+    <div class="err" id="login-err"></div>
   </div>
 </div>
 
 <!-- App -->
 <div id="app">
   <div class="topbar">
-    <h1>博客管理后台</h1>
-    <button class="btn-secondary btn-sm" onclick="openNew()">+ 新建文章</button>
-    <button class="btn-secondary btn-sm" onclick="logout()">退出</button>
+    <span class="topbar-title">博客管理后台</span>
+    <button class="btn-s btn-sm" onclick="openNewDlg()">✚ 新建文章</button>
+    <button class="btn-s btn-sm" onclick="openUploadDlg()">↑ 上传 MD</button>
+    <button class="btn-s btn-sm" onclick="logout()">退出</button>
   </div>
-  <div class="main">
+  <div class="wrap">
+
+    <!-- Sidebar -->
     <div class="sidebar">
-      <div id="file-list"></div>
-    </div>
-    <div class="editor-area">
-      <div id="editor-wrap" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none;">
-        <div class="editor-toolbar">
-          <span id="file-badge" style="font-size:12px;color:var(--muted);min-width:120px;"></span>
-          <input type="text" id="commit-msg" placeholder="提交说明（留空自动生成）">
-          <button class="btn-primary btn-sm" onclick="saveFile()">保存并发布</button>
-          <button class="btn-danger btn-sm" onclick="deleteFile()">删除</button>
-        </div>
-        <div class="editor-panes">
-          <textarea id="editor" spellcheck="false"
-            oninput="renderPreview()" placeholder="在这里写 Markdown..."></textarea>
-          <div class="preview" id="preview"></div>
-        </div>
+      <div class="file-list" id="file-list">
+        <div style="padding:16px;color:var(--muted);font-size:13px">加载中...</div>
       </div>
-      <div class="empty-state" id="empty-state">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    </div>
+
+    <!-- Editor -->
+    <div class="editor-area">
+      <!-- toolbar (hidden until file opened) -->
+      <div class="editor-toolbar" id="toolbar" style="display:none">
+        <span class="path-badge" id="path-badge"></span>
+        <input id="commit-msg" type="text" placeholder="提交说明（留空自动生成）">
+        <button class="btn-p btn-sm" id="save-btn" onclick="saveFile()">保存发布</button>
+        <button class="btn-d btn-sm" onclick="deleteFile()">删除</button>
+      </div>
+      <!-- panes -->
+      <div class="panes" id="panes" style="display:none">
+        <textarea id="editor" spellcheck="false" oninput="renderPreview()"
+          placeholder="在这里写 Markdown..."></textarea>
+        <div class="preview" id="preview"></div>
+      </div>
+      <!-- empty -->
+      <div class="empty" id="empty">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/>
-          <line x1="16" y1="17" x2="8" y2="17"/>
         </svg>
-        <span>从左侧选择文件，或新建文章</span>
+        从左侧选择文件，或新建 / 上传文章
       </div>
     </div>
+
   </div>
-  <div class="statusbar info" id="statusbar">就绪</div>
+  <div class="statusbar info" id="status">就绪</div>
 </div>
 
-<!-- New file dialog -->
-<div class="dialog-overlay" id="new-dialog">
+<!-- New article dialog -->
+<div class="overlay" id="new-dlg">
   <div class="dialog">
     <h3>新建文章</h3>
     <label>分区</label>
@@ -176,230 +197,89 @@
       <option value="notes">编程笔记</option>
       <option value="projects">项目实战</option>
     </select>
-    <label>文件名（英文，不含 .md）</label>
-    <input type="text" id="new-slug" placeholder="例如：deepseek">
-    <div style="display:flex;gap:8px;margin-top:4px;">
-      <button class="btn-primary" style="flex:1" onclick="createFile()">创建</button>
-      <button class="btn-secondary" style="flex:1" onclick="closeNew()">取消</button>
+    <label>文件名（英文小写，不含 .md）</label>
+    <input id="new-slug" type="text" placeholder="例：deepseek">
+    <div class="dialog-footer">
+      <button class="btn-p" style="flex:1" onclick="createFile()">创建并编辑</button>
+      <button class="btn-s" style="flex:1" onclick="closeDlg('new-dlg')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload dialog -->
+<div class="overlay" id="upload-dlg">
+  <div class="dialog">
+    <h3>上传本地 MD 文件</h3>
+    <label>分区</label>
+    <select id="up-section">
+      <option value="ai">AI 平台</option>
+      <option value="notes">编程笔记</option>
+      <option value="projects">项目实战</option>
+    </select>
+    <div class="upload-zone" id="drop-zone"
+      onclick="document.getElementById('file-input').click()"
+      ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+      <input id="file-input" type="file" accept=".md,text/markdown,text/plain"
+        onchange="fileSelected(event)">
+      <div style="font-size:22px">📄</div>
+      <strong>点击选择或拖拽 .md 文件</strong>
+      <p id="drop-hint">支持单个 Markdown 文件</p>
+    </div>
+    <label>保存为文件名（英文小写，不含 .md）</label>
+    <input id="up-slug" type="text" placeholder="留空则使用原文件名">
+    <div class="dialog-footer">
+      <button class="btn-p" style="flex:1" id="upload-btn" onclick="uploadFile()" disabled>上传并编辑</button>
+      <button class="btn-s" style="flex:1" onclick="closeDlg('upload-dlg')">取消</button>
     </div>
   </div>
 </div>
 
 <script>
-const OWNER = 'keane11'
-const REPO  = 'keanedata'
-const BRANCH = 'main'
-
+const OWNER = 'keane11', REPO = 'keanedata', BRANCH = 'main'
 const SECTIONS = {
   ai:       { label: 'AI 平台',  path: 'docs/ai' },
   notes:    { label: '编程笔记', path: 'docs/notes' },
   projects: { label: '项目实战', path: 'docs/projects' },
 }
 
-let token = '', currentFile = null, currentSha = null
+let token = '', curPath = '', curSha = '', uploadContent = ''
 
 // ── Auth ──────────────────────────────────────────────────────────────
 async function login() {
-  const t = document.getElementById('token-input').value.trim()
+  const t = document.getElementById('tok').value.trim()
   if (!t) return
-  setStatus('验证中...', 'info')
-  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {
-    headers: { Authorization: `token ${t}` }
-  })
-  if (!res.ok) {
-    document.getElementById('login-err').textContent = 'Token 无效或无权限，请检查后重试。'
-    setStatus('', 'info'); return
+  setStatus('验证中…', 'info')
+  document.getElementById('login-err').textContent = ''
+  try {
+    const r = await ghFetch(`repos/${OWNER}/${REPO}`)
+    if (!r.ok) throw new Error(r.status === 401 ? 'Token 无效' : `错误 ${r.status}`)
+    token = t
+    sessionStorage.setItem('gh_tok', t)
+    document.getElementById('login').style.display = 'none'
+    document.getElementById('app').style.display = 'flex'
+    await loadList()
+  } catch(e) {
+    document.getElementById('login-err').textContent = e.message
+    setStatus('', 'info')
   }
-  token = t
-  sessionStorage.setItem('gh_token', t)
-  showApp()
-}
-
-function logout() {
-  sessionStorage.removeItem('gh_token')
-  token = ''; location.reload()
-}
-
-// ── Init ──────────────────────────────────────────────────────────────
-window.onload = async () => {
-  const saved = sessionStorage.getItem('gh_token')
-  if (saved) { token = saved; showApp() }
-}
-
-async function showApp() {
-  document.getElementById('login').style.display = 'none'
-  document.getElementById('app').style.display   = 'flex'
-  await loadFileList()
-}
-
-// ── File list ─────────────────────────────────────────────────────────
-async function loadFileList() {
-  const list = document.getElementById('file-list')
-  list.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13px;">加载中...</div>'
-
-  let html = ''
-  for (const [key, sec] of Object.entries(SECTIONS)) {
-    const res = await api(`contents/${sec.path}`)
-    const files = (await res.json())
-      .filter(f => f.name.endsWith('.md') && f.name !== 'index.md')
-      .sort((a, b) => a.name.localeCompare(b.name))
-
-    html += `<div class="sidebar-section">
-      <div class="sidebar-section-title">${sec.label}</div>`
-    for (const f of files) {
-      const label = f.name.replace('.md', '')
-      html += `<div class="sidebar-item" onclick="openFile('${sec.path}/${f.name}','${f.sha}',this)"
-        title="${f.name}">📄 ${label}</div>`
-    }
-    html += `</div>`
-  }
-  list.innerHTML = html
-}
-
-// ── Open file ─────────────────────────────────────────────────────────
-async function openFile(path, sha, el) {
-  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'))
-  el.classList.add('active')
-  setStatus('加载文件...', 'info')
-
-  const res = await api(`contents/${path}`)
-  const data = await res.json()
-  const content = atob(data.content.replace(/\n/g, ''))
-
-  currentFile = path
-  currentSha  = data.sha
-  document.getElementById('editor').value = content
-  document.getElementById('file-badge').textContent = path.split('/').pop()
-  document.getElementById('commit-msg').value = ''
-  renderPreview()
-  showEditor()
-  setStatus(`已打开：${path}`, 'ok')
-}
-
-// ── Save file ─────────────────────────────────────────────────────────
-async function saveFile() {
-  if (!currentFile) return
-  const content = document.getElementById('editor').value
-  const msg = document.getElementById('commit-msg').value.trim()
-        || `docs: update ${currentFile.split('/').pop()}`
-
-  setStatus('提交中...', 'info')
-  const body = {
-    message: msg,
-    content: btoa(unescape(encodeURIComponent(content))),
-    branch:  BRANCH,
-  }
-  if (currentSha) body.sha = currentSha
-
-  const res = await api(`contents/${currentFile}`, 'PUT', body)
-  if (res.ok) {
-    const data = await res.json()
-    currentSha = data.content.sha
-    setStatus(`已发布：${msg}`, 'ok')
-  } else {
-    const err = await res.json()
-    setStatus('保存失败：' + (err.message || res.status), 'err')
-  }
-}
-
-// ── Delete file ───────────────────────────────────────────────────────
-async function deleteFile() {
-  if (!currentFile || !currentSha) return
-  if (!confirm(`确定删除 ${currentFile.split('/').pop()} 吗？此操作不可撤销。`)) return
-
-  setStatus('删除中...', 'info')
-  const res = await api(`contents/${currentFile}`, 'DELETE', {
-    message: `docs: delete ${currentFile.split('/').pop()}`,
-    sha: currentSha,
-    branch: BRANCH,
-  })
-  if (res.ok) {
-    currentFile = null; currentSha = null
-    hideEditor()
-    await loadFileList()
-    setStatus('已删除', 'ok')
-  } else {
-    setStatus('删除失败', 'err')
-  }
-}
-
-// ── New file ──────────────────────────────────────────────────────────
-function openNew()  { document.getElementById('new-dialog').classList.add('open') }
-function closeNew() { document.getElementById('new-dialog').classList.remove('open') }
-
-async function createFile() {
-  const section = document.getElementById('new-section').value
-  const slug    = document.getElementById('new-slug').value.trim().toLowerCase().replace(/\s+/g, '-')
-  if (!slug) { alert('请输入文件名'); return }
-
-  const path    = `${SECTIONS[section].path}/${slug}.md`
-  const date    = new Date().toISOString().slice(0, 10)
-  const title   = slug.charAt(0).toUpperCase() + slug.slice(1)
-  const tpl     = `---\ntitle: ${title}\ndate: ${date}\n---\n\n# ${title}\n\n> 简介：一句话介绍这篇文章。\n\n## 章节一\n\n内容...\n`
-
-  setStatus('创建中...', 'info')
-  const res = await api(`contents/${path}`, 'PUT', {
-    message: `docs: create ${slug}.md`,
-    content: btoa(unescape(encodeURIComponent(tpl))),
-    branch:  BRANCH,
-  })
-  if (res.ok) {
-    const data = await res.json()
-    closeNew()
-    document.getElementById('new-slug').value = ''
-    await loadFileList()
-    // 自动打开刚创建的文件
-    currentFile = path
-    currentSha  = data.content.sha
-    document.getElementById('editor').value = tpl
-    document.getElementById('file-badge').textContent = `${slug}.md`
-    document.getElementById('commit-msg').value = ''
-    renderPreview()
-    showEditor()
-    // 高亮侧边栏
-    document.querySelectorAll('.sidebar-item').forEach(el => {
-      if (el.title === `${slug}.md`) el.classList.add('active')
+  function ghFetch(p) {
+    return fetch(`https://api.github.com/${p}`, {
+      headers: { Authorization: `token ${t}`, Accept: 'application/vnd.github+json' }
     })
-    setStatus(`已创建：${slug}.md`, 'ok')
-  } else {
-    const err = await res.json()
-    setStatus('创建失败：' + (err.message || '文件可能已存在'), 'err')
   }
 }
 
-// ── Markdown preview ──────────────────────────────────────────────────
-function renderPreview() {
-  const md = document.getElementById('editor').value
-  document.getElementById('preview').innerHTML = parseMarkdown(md)
+function logout() { sessionStorage.removeItem('gh_tok'); token=''; location.reload() }
+
+window.onload = () => {
+  const t = sessionStorage.getItem('gh_tok')
+  if (t) { token = t; document.getElementById('tok').value = t; login() }
+  document.getElementById('tok').addEventListener('keydown', e => e.key==='Enter' && login())
+  document.getElementById('new-slug').addEventListener('keydown', e => e.key==='Enter' && createFile())
 }
 
-function parseMarkdown(md) {
-  return md
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/```(\w*)\n([\s\S]*?)```/g, (_,_l,c)=>`<pre><code>${c.replace(/&lt;/g,'<').replace(/&gt;/g,'>')}</code></pre>`)
-    .replace(/^#{3} (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^#{2} (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm,    '<h1>$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,     '<em>$1</em>')
-    .replace(/`([^`]+)`/g,     '<code>$1</code>')
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
-    .replace(/^> (.+)$/gm,   '<blockquote>$1</blockquote>')
-    .replace(/^---$/gm,       '<hr>')
-    .replace(/^\| (.+) \|$/gm, r => {
-      const cells = r.slice(2,-2).split(' | ')
-      return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>'
-    })
-    .replace(/(<tr>.*<\/tr>\n?)+/g, s => `<table>${s}</table>`)
-    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g, s => `<ul>${s}</ul>`)
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(?!<[a-z])/gm, '')
-    .replace(/(<\/p><p>)+/g, '</p><p>')
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────
-function api(path, method = 'GET', body) {
+// ── API helper ────────────────────────────────────────────────────────
+function api(path, method='GET', body) {
   return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/${path}`, {
     method,
     headers: {
@@ -411,25 +291,264 @@ function api(path, method = 'GET', body) {
   })
 }
 
-function showEditor() {
-  document.getElementById('editor-wrap').style.display = 'flex'
-  document.getElementById('empty-state').style.display = 'none'
-}
-function hideEditor() {
-  document.getElementById('editor-wrap').style.display = 'none'
-  document.getElementById('empty-state').style.display = 'flex'
-}
-function setStatus(msg, type) {
-  const el = document.getElementById('statusbar')
-  el.textContent = msg
-  el.className   = `statusbar ${type}`
+// ── File list ─────────────────────────────────────────────────────────
+async function loadList() {
+  const el = document.getElementById('file-list')
+  el.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13px">加载中…</div>'
+  let html = ''
+  for (const [key, sec] of Object.entries(SECTIONS)) {
+    let files = []
+    try {
+      const r = await api(`contents/${sec.path}`)
+      if (r.ok) {
+        const data = await r.json()
+        files = data.filter(f => f.name.endsWith('.md') && f.name !== 'index.md')
+                    .sort((a,b) => a.name.localeCompare(b.name))
+      }
+    } catch {}
+    html += `<div class="sec-title">${sec.label}</div>`
+    if (!files.length) {
+      html += `<div style="padding:4px 14px 8px;font-size:12px;color:var(--muted)">暂无文章</div>`
+    }
+    for (const f of files) {
+      const name = f.name.replace('.md','')
+      html += `<div class="file-item" data-path="${sec.path}/${f.name}" data-sha="${f.sha}"
+        onclick="openFile(this)" title="${f.name}">📄 <span class="file-name">${name}</span></div>`
+    }
+  }
+  el.innerHTML = html
 }
 
-// Enter key submits login
-document.getElementById('token-input')
-  .addEventListener('keydown', e => e.key === 'Enter' && login())
-document.getElementById('new-slug')
-  .addEventListener('keydown', e => e.key === 'Enter' && createFile())
+// ── Open file ─────────────────────────────────────────────────────────
+async function openFile(el) {
+  document.querySelectorAll('.file-item').forEach(i => i.classList.remove('active'))
+  el.classList.add('active')
+  const path = el.dataset.path
+  setStatus('加载中…', 'info')
+  const r = await api(`contents/${path}`)
+  if (!r.ok) { setStatus('加载失败', 'err'); return }
+  const data = await r.json()
+  const content = decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))))
+  loadEditor(path, data.sha, content)
+  setStatus(`已打开 ${path.split('/').pop()}`, 'ok')
+}
+
+function loadEditor(path, sha, content) {
+  curPath = path; curSha = sha
+  document.getElementById('editor').value = content
+  document.getElementById('path-badge').textContent = path
+  document.getElementById('commit-msg').value = ''
+  renderPreview()
+  document.getElementById('toolbar').style.display = 'flex'
+  document.getElementById('panes').style.display   = 'flex'
+  document.getElementById('empty').style.display   = 'none'
+}
+
+// ── Save ──────────────────────────────────────────────────────────────
+async function saveFile() {
+  if (!curPath) return
+  const btn = document.getElementById('save-btn')
+  btn.disabled = true
+  const content = document.getElementById('editor').value
+  const msg = document.getElementById('commit-msg').value.trim()
+        || `docs: update ${curPath.split('/').pop()}`
+  setStatus('提交中…', 'info')
+  const body = {
+    message: msg,
+    content: btoa(unescape(encodeURIComponent(content))),
+    branch: BRANCH,
+  }
+  if (curSha) body.sha = curSha
+  const r = await api(`contents/${curPath}`, 'PUT', body)
+  btn.disabled = false
+  if (r.ok) {
+    const d = await r.json()
+    curSha = d.content.sha
+    await loadList()
+    setStatus(`✓ 已发布：${msg}`, 'ok')
+  } else {
+    const e = await r.json().catch(() => ({}))
+    setStatus('保存失败：' + (e.message || r.status), 'err')
+  }
+}
+
+// ── Delete ────────────────────────────────────────────────────────────
+async function deleteFile() {
+  if (!curPath || !curSha) return
+  if (!confirm(`确定删除「${curPath.split('/').pop()}」？`)) return
+  setStatus('删除中…', 'info')
+  const r = await api(`contents/${curPath}`, 'DELETE', {
+    message: `docs: delete ${curPath.split('/').pop()}`,
+    sha: curSha, branch: BRANCH,
+  })
+  if (r.ok) {
+    curPath = ''; curSha = ''
+    document.getElementById('toolbar').style.display = 'none'
+    document.getElementById('panes').style.display   = 'none'
+    document.getElementById('empty').style.display   = 'flex'
+    document.querySelectorAll('.file-item').forEach(i => i.classList.remove('active'))
+    await loadList()
+    setStatus('已删除', 'ok')
+  } else {
+    setStatus('删除失败', 'err')
+  }
+}
+
+// ── New file ──────────────────────────────────────────────────────────
+function openNewDlg() { document.getElementById('new-dlg').classList.add('open') }
+function closeDlg(id) { document.getElementById(id).classList.remove('open') }
+
+async function createFile() {
+  const section = document.getElementById('new-section').value
+  const slug = document.getElementById('new-slug').value.trim().toLowerCase().replace(/\s+/g,'-')
+  if (!slug) { alert('请输入文件名'); return }
+  const path = `${SECTIONS[section].path}/${slug}.md`
+  const date = new Date().toISOString().slice(0,10)
+  const title = slug.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase())
+  const tpl = `---\ntitle: ${title}\ndate: ${date}\n---\n\n# ${title}\n\n> 简介：一句话介绍这篇文章。\n\n## 章节一\n\n内容...\n`
+  setStatus('创建中…', 'info')
+  const r = await api(`contents/${path}`, 'PUT', {
+    message: `docs: create ${slug}.md`,
+    content: btoa(unescape(encodeURIComponent(tpl))),
+    branch: BRANCH,
+  })
+  if (r.ok) {
+    const d = await r.json()
+    closeDlg('new-dlg')
+    document.getElementById('new-slug').value = ''
+    await loadList()
+    // highlight sidebar item
+    document.querySelectorAll('.file-item').forEach(i => {
+      if (i.dataset.path === path) { i.classList.add('active') }
+      else i.classList.remove('active')
+    })
+    loadEditor(path, d.content.sha, tpl)
+    setStatus(`✓ 已创建 ${slug}.md`, 'ok')
+  } else {
+    const e = await r.json().catch(() => ({}))
+    setStatus('创建失败：' + (e.message || '文件可能已存在'), 'err')
+    closeDlg('new-dlg')
+  }
+}
+
+// ── Upload local MD ───────────────────────────────────────────────────
+function openUploadDlg() {
+  uploadContent = ''
+  document.getElementById('upload-btn').disabled = true
+  document.getElementById('drop-hint').textContent = '支持单个 Markdown 文件'
+  document.getElementById('up-slug').value = ''
+  document.getElementById('file-input').value = ''
+  document.getElementById('upload-dlg').classList.add('open')
+}
+
+function readMD(file) {
+  if (!file.name.endsWith('.md') && !file.type.includes('markdown') && !file.type.includes('plain')) {
+    alert('请选择 .md 文件'); return
+  }
+  const reader = new FileReader()
+  reader.onload = e => {
+    uploadContent = e.target.result
+    const suggested = file.name.replace('.md','').toLowerCase().replace(/\s+/g,'-')
+    if (!document.getElementById('up-slug').value) {
+      document.getElementById('up-slug').value = suggested
+    }
+    document.getElementById('drop-hint').textContent = `✓ 已读取：${file.name}（${(file.size/1024).toFixed(1)} KB）`
+    document.getElementById('upload-btn').disabled = false
+  }
+  reader.readAsText(file, 'utf-8')
+}
+
+function fileSelected(e) { if (e.target.files[0]) readMD(e.target.files[0]) }
+function dragOver(e)  { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag') }
+function dragLeave(e) { document.getElementById('drop-zone').classList.remove('drag') }
+function dropFile(e)  { e.preventDefault(); dragLeave(e); if (e.dataTransfer.files[0]) readMD(e.dataTransfer.files[0]) }
+
+async function uploadFile() {
+  if (!uploadContent) return
+  const section = document.getElementById('up-section').value
+  const slug = document.getElementById('up-slug').value.trim().toLowerCase().replace(/\s+/g,'-')
+  if (!slug) { alert('请填写文件名'); return }
+  const path = `${SECTIONS[section].path}/${slug}.md`
+
+  // check if exists first
+  const check = await api(`contents/${path}`)
+  let sha = ''
+  if (check.ok) {
+    const existing = await check.json()
+    sha = existing.sha
+    if (!confirm(`「${slug}.md」已存在，覆盖？`)) return
+  }
+
+  setStatus('上传中…', 'info')
+  const body = {
+    message: `docs: upload ${slug}.md`,
+    content: btoa(unescape(encodeURIComponent(uploadContent))),
+    branch: BRANCH,
+  }
+  if (sha) body.sha = sha
+  const r = await api(`contents/${path}`, 'PUT', body)
+  if (r.ok) {
+    const d = await r.json()
+    closeDlg('upload-dlg')
+    await loadList()
+    document.querySelectorAll('.file-item').forEach(i => {
+      if (i.dataset.path === path) i.classList.add('active')
+      else i.classList.remove('active')
+    })
+    loadEditor(path, d.content.sha, uploadContent)
+    setStatus(`✓ 已上传 ${slug}.md`, 'ok')
+  } else {
+    const e = await r.json().catch(() => ({}))
+    setStatus('上传失败：' + (e.message || r.status), 'err')
+  }
+}
+
+// ── Markdown preview ──────────────────────────────────────────────────
+function renderPreview() {
+  const md = document.getElementById('editor').value
+  document.getElementById('preview').innerHTML = parseMD(md)
+}
+
+function parseMD(md) {
+  let h = md
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    // fenced code
+    .replace(/```[\w]*\n([\s\S]*?)```/g, (_,c) => `<pre><code>${c}</code></pre>`)
+    // headings
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,  '<h1>$1</h1>')
+    // bold/italic/inline code
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    // links
+    .replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2">$1</a>')
+    // blockquote
+    .replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>')
+    // hr
+    .replace(/^---$/gm,'<hr>')
+    // table rows
+    .replace(/^\|(.+)\|$/gm, r => {
+      const cells = r.slice(1,-1).split('|').map(c => c.trim())
+      return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>'
+    })
+    .replace(/(<tr>.*?<\/tr>\n?)+/gs, s => `<table>${s}</table>`)
+    // table separator rows
+    .replace(/<tr><td>[-:| ]+<\/td><\/tr>/g,'')
+    // lists
+    .replace(/^[-*] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*?<\/li>\n?)+/gs, s => `<ul>${s}</ul>`)
+    // paragraphs
+    .replace(/\n\n(?!<)/g,'</p><p>')
+  return `<p>${h}</p>`
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById('status')
+  el.textContent = msg
+  el.className = `statusbar ${type}`
+}
 </script>
 </body>
 </html>
