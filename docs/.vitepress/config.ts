@@ -1,4 +1,38 @@
 import { defineConfig } from 'vitepress'
+import { generateSidebar } from 'vitepress-sidebar'
+
+const sidebar = generateSidebar([
+  {
+    documentRootPath: 'docs',
+    scanStartPath: 'ai',
+    resolvePath: '/ai/',
+    useTitleFromFileHeading: true,
+    useFolderTitleFromIndexFile: true,
+    excludeFiles: ['index.md'],
+    sortMenusByFrontmatterOrder: true,
+    frontmatterOrderDefaultValue: 99,
+  },
+  {
+    documentRootPath: 'docs',
+    scanStartPath: 'notes',
+    resolvePath: '/notes/',
+    useTitleFromFileHeading: true,
+    useFolderTitleFromIndexFile: true,
+    excludeFiles: ['index.md'],
+    sortMenusByFrontmatterOrder: true,
+    frontmatterOrderDefaultValue: 99,
+  },
+  {
+    documentRootPath: 'docs',
+    scanStartPath: 'projects',
+    resolvePath: '/projects/',
+    useTitleFromFileHeading: true,
+    useFolderTitleFromIndexFile: true,
+    excludeFiles: ['index.md'],
+    sortMenusByFrontmatterOrder: true,
+    frontmatterOrderDefaultValue: 99,
+  },
+])
 
 export default defineConfig({
   title: 'Keane 的技术笔记',
@@ -20,41 +54,7 @@ export default defineConfig({
       { text: '文件共享', link: 'https://share.keaneai.top', target: '_blank' },
     ],
 
-    sidebar: {
-      '/ai/': [
-        {
-          text: 'AI 平台',
-          items: [
-            { text: '概览', link: '/ai/' },
-            { text: 'Claude', link: '/ai/claude' },
-            { text: 'OpenAI', link: '/ai/openai' },
-            { text: 'Gemini', link: '/ai/gemini' },
-            { text: '提示词工程', link: '/ai/prompt' },
-          ],
-        },
-      ],
-      '/notes/': [
-        {
-          text: '编程笔记',
-          items: [
-            { text: '概览', link: '/notes/' },
-            { text: 'Python', link: '/notes/python' },
-            { text: 'Docker', link: '/notes/docker' },
-            { text: 'Linux', link: '/notes/linux' },
-            { text: 'Git', link: '/notes/git' },
-          ],
-        },
-      ],
-      '/projects/': [
-        {
-          text: '项目实战',
-          items: [
-            { text: '概览', link: '/projects/' },
-            { text: 'QR 文件共享', link: '/projects/qr-file-share' },
-          ],
-        },
-      ],
-    },
+    sidebar,
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/keane11' },
@@ -66,7 +66,7 @@ export default defineConfig({
 
     footer: {
       message: '用 VitePress 构建',
-      copyright: 'Copyright © 2024 Keane',
+      copyright: 'Copyright © 2025 Keane',
     },
 
     outline: {
