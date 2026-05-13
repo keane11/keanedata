@@ -512,12 +512,15 @@ async function saveFile(){
   const d=await r.json()
   const newSha=d.content.sha
 
-  // 迁移成功后删除旧文件
+  // 迁移成功后删除旧文件，同步 index.md
   if(moving){
     await api(`contents/${curPath}`,'DELETE',{
       message:`docs: remove ${fileName} (moved to ${SECTIONS[newKey].label})`,
       sha:curSha,branch:BRANCH
     })
+    const slug=fileName.replace(/\.md$/,'')
+    await removeFromSectionIndex(oldKey,slug)
+    await updateSectionIndex(newKey,slug,titleVal||slug.replace(/_/g,' ').replace(/-/g,' '))
     delete titleCache[curPath]
   }
 
@@ -544,6 +547,8 @@ async function deleteFile(){
   const r=await api(`contents/${curPath}`,'DELETE',{
     message:`docs: delete ${curPath.split('/').pop()}`,sha:curSha,branch:BRANCH})
   if(r.ok){
+    const secKey=Object.keys(SECTIONS).find(k=>curPath.startsWith(SECTIONS[k].path+'/'))
+    if(secKey) await removeFromSectionIndex(secKey,curPath.split('/').pop().replace(/\.md$/,''))
     curPath='';curSha=''
     document.getElementById('toolbar').style.display='none'
     document.getElementById('panes').style.display='none'
@@ -551,6 +556,44 @@ async function deleteFile(){
     document.querySelectorAll('.file-item').forEach(i=>i.classList.remove('active'))
     await loadList();setStatus('已删除','ok')
   }else setStatus('删除失败','err')
+}
+
+// ── Index.md 自动联动 ─────────────────────────────────────────────────
+async function updateSectionIndex(sectionKey,slug,title){
+  const sec=SECTIONS[sectionKey];if(!sec)return
+  const ipath=`${sec.path}/index.md`
+  const r=await api(`contents/${ipath}`)
+  if(!r.ok)return
+  const d=await r.json()
+  let text=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))))
+  if(text.includes(`(./${slug})`))return            // 已存在，跳过
+  const lines=text.split('\n')
+  let lastList=-1
+  for(let i=lines.length-1;i>=0;i--){if(/^- \[/.test(lines[i])){lastList=i;break}}
+  const entry=`- [${title}](./${slug})`
+  if(lastList>=0)lines.splice(lastList+1,0,entry);else lines.push('',entry)
+  await api(`contents/${ipath}`,'PUT',{
+    message:`docs: add ${slug} to ${sec.label} index`,
+    content:btoa(unescape(encodeURIComponent(lines.join('\n')))),
+    sha:d.sha,branch:BRANCH
+  }).catch(()=>{})
+}
+
+async function removeFromSectionIndex(sectionKey,slug){
+  const sec=SECTIONS[sectionKey];if(!sec)return
+  const ipath=`${sec.path}/index.md`
+  const r=await api(`contents/${ipath}`)
+  if(!r.ok)return
+  const d=await r.json()
+  let text=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))))
+  const lines=text.split('\n')
+  const filtered=lines.filter(l=>!l.includes(`(./${slug})`))
+  if(filtered.length===lines.length)return           // 不在列表中
+  await api(`contents/${ipath}`,'PUT',{
+    message:`docs: remove ${slug} from ${sec.label} index`,
+    content:btoa(unescape(encodeURIComponent(filtered.join('\n')))),
+    sha:d.sha,branch:BRANCH
+  }).catch(()=>{})
 }
 
 // ── New file ──────────────────────────────────────────────────────────
@@ -581,6 +624,7 @@ async function createFile(){
   closeDlg('new-dlg')
   if(r.ok){
     const d=await r.json()
+    await updateSectionIndex(section,slug,title)
     await loadList()
     document.querySelectorAll('.file-item').forEach(i=>i.classList[i.dataset.path===path?'add':'remove']('active'))
     loadEditor(path,d.content.sha,tpl,true)
@@ -632,8 +676,8 @@ async function uploadFile(){
   if(!slug){alert('请填写文件名');return}
   const path=`${SECTIONS[section].path}/${slug}.md`
   const check=await api(`contents/${path}`)
-  let sha=''
-  if(check.ok){const ex=await check.json();sha=ex.sha;if(!confirm(`「${slug}.md」已存在，覆盖？`))return}
+  let sha='',isNew=true
+  if(check.ok){const ex=await check.json();sha=ex.sha;isNew=false;if(!confirm(`「${slug}.md」已存在，覆盖？`))return}
   setStatus('上传中…','info')
   const body={message:`docs: upload ${slug}.md`,content:btoa(unescape(encodeURIComponent(uploadContent))),branch:BRANCH}
   if(sha)body.sha=sha
@@ -641,6 +685,11 @@ async function uploadFile(){
   closeDlg('upload-dlg')
   if(r.ok){
     const d=await r.json()
+    if(isNew){
+      const upFm=parseFrontmatter(uploadContent)
+      const upTitle=upFm.title||slug.replace(/_/g,' ').replace(/-/g,' ')
+      await updateSectionIndex(section,slug,upTitle)
+    }
     await loadList()
     document.querySelectorAll('.file-item').forEach(i=>i.classList[i.dataset.path===path?'add':'remove']('active'))
     loadEditor(path,d.content.sha,uploadContent,true)

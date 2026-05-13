@@ -25,11 +25,11 @@ export default defineConfig({
   ignoreDeadLinks: true,
 
   head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
   ],
 
   themeConfig: {
-    logo: '/favicon.ico',
+    logo: '/favicon.svg',
 
     nav: [
       { text: '首页',   link: '/' },
