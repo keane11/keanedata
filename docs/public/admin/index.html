@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>博客管理后台</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f9fa; --surface: #fff; --border: #e1e4e8;
+    --brand: #4f6ef7; --brand-hover: #3b5bdb;
+    --text: #24292f; --muted: #656d76;
+    --danger: #cf222e; --success: #1a7f37;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── Login ── */
+  #login { display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; }
+  .login-card { background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 40px; width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+  .login-card h1 { font-size: 22px; margin-bottom: 6px; }
+  .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .login-card a { color: var(--brand); }
+
+  /* ── App shell ── */
+  #app { display: none; height: 100vh; flex-direction: column; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 12px; }
+  .topbar h1 { font-size: 16px; font-weight: 600; flex: 1; }
+  .main { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar { width: 240px; border-right: 1px solid var(--border); background: var(--surface);
+    overflow-y: auto; padding: 12px 0; flex-shrink: 0; }
+  .sidebar-section { margin-bottom: 4px; }
+  .sidebar-section-title { padding: 6px 16px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; color: var(--muted); letter-spacing: .6px; }
+  .sidebar-item { display: flex; align-items: center; padding: 6px 16px; font-size: 13px;
+    cursor: pointer; border-radius: 0; gap: 8px; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; }
+  .sidebar-item:hover { background: var(--bg); }
+  .sidebar-item.active { background: rgba(79,110,247,.1); color: var(--brand); font-weight: 500; }
+  .sidebar-new { margin: 8px 12px 0; }
+
+  /* ── Editor area ── */
+  .editor-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .editor-toolbar { padding: 10px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px; background: var(--surface); }
+  .editor-toolbar input { flex: 1; border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; font-size: 14px; outline: none; }
+  .editor-toolbar input:focus { border-color: var(--brand); }
+  .editor-panes { display: flex; flex: 1; overflow: hidden; }
+  textarea { flex: 1; border: none; border-right: 1px solid var(--border); padding: 16px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 14px; line-height: 1.7;
+    resize: none; outline: none; background: #fafbfc; color: var(--text); }
+  .preview { flex: 1; overflow-y: auto; padding: 16px 24px; }
+  .empty-state { flex: 1; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); flex-direction: column; gap: 12px; }
+
+  /* ── Buttons ── */
+  button { cursor: pointer; border: none; border-radius: 6px; font-size: 14px;
+    padding: 7px 14px; font-weight: 500; transition: background .15s; }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:hover { background: var(--brand-hover); }
+  .btn-secondary { background: var(--bg); border: 1px solid var(--border); color: var(--text); }
+  .btn-secondary:hover { background: #eaecef; }
+  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+  .btn-danger:hover { background: #fff0ee; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-full { width: 100%; }
+
+  /* ── Status bar ── */
+  .statusbar { padding: 6px 16px; font-size: 12px; border-top: 1px solid var(--border);
+    background: var(--surface); min-height: 30px; }
+  .statusbar.ok { color: var(--success); }
+  .statusbar.err { color: var(--danger); }
+  .statusbar.info { color: var(--muted); }
+
+  /* ── New file dialog ── */
+  .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    display: none; align-items: center; justify-content: center; z-index: 100; }
+  .dialog-overlay.open { display: flex; }
+  .dialog { background: var(--surface); border-radius: 10px; padding: 24px;
+    width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,.15); }
+  .dialog h3 { margin-bottom: 16px; }
+  .dialog label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px; }
+  .dialog select, .dialog input[type=text] { width: 100%; border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 10px; font-size: 14px; outline: none; margin-bottom: 12px; }
+  .dialog select:focus, .dialog input[type=text]:focus { border-color: var(--brand); }
+
+  /* ── Markdown preview styles ── */
+  .preview h1,.preview h2,.preview h3 { margin: 1em 0 .4em; line-height: 1.3; }
+  .preview h1 { font-size: 1.8em; } .preview h2 { font-size: 1.4em; }
+  .preview p { margin-bottom: .8em; line-height: 1.7; }
+  .preview code { background: rgba(79,110,247,.1); color: var(--brand); padding: 2px 6px;
+    border-radius: 4px; font-size: .9em; }
+  .preview pre { background: #1e1e2e; color: #cdd6f4; padding: 14px; border-radius: 8px;
+    overflow-x: auto; margin-bottom: .8em; }
+  .preview pre code { background: none; color: inherit; padding: 0; }
+  .preview table { border-collapse: collapse; width: 100%; margin-bottom: .8em; }
+  .preview th { background: rgba(79,110,247,.1); }
+  .preview th, .preview td { border: 1px solid var(--border); padding: 8px 12px; font-size: 14px; }
+  .preview blockquote { border-left: 4px solid var(--brand); background: rgba(79,110,247,.07);
+    padding: 10px 14px; border-radius: 0 6px 6px 0; margin-bottom: .8em; }
+  .preview ul, .preview ol { padding-left: 1.4em; margin-bottom: .8em; }
+  .preview li { margin-bottom: .3em; line-height: 1.6; }
+  .preview hr { border: none; border-top: 1px solid var(--border); margin: 1.2em 0; }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login">
+  <div class="login-card">
+    <h1>博客管理后台</h1>
+    <p>输入 GitHub Personal Access Token 登录。<br>
+      需要 <code>repo</code> + <code>workflow</code> 权限。<br>
+      <a href="https://github.com/settings/tokens/new" target="_blank">生成 Token →</a>
+    </p>
+    <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx"
+      style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;
+             font-size:14px;outline:none;margin-bottom:12px;">
+    <button class="btn-primary btn-full" onclick="login()">登录</button>
+    <div id="login-err" style="color:var(--danger);font-size:13px;margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <div class="topbar">
+    <h1>博客管理后台</h1>
+    <button class="btn-secondary btn-sm" onclick="openNew()">+ 新建文章</button>
+    <button class="btn-secondary btn-sm" onclick="logout()">退出</button>
+  </div>
+  <div class="main">
+    <div class="sidebar">
+      <div id="file-list"></div>
+    </div>
+    <div class="editor-area">
+      <div id="editor-wrap" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none;">
+        <div class="editor-toolbar">
+          <span id="file-badge" style="font-size:12px;color:var(--muted);min-width:120px;"></span>
+          <input type="text" id="commit-msg" placeholder="提交说明（留空自动生成）">
+          <button class="btn-primary btn-sm" onclick="saveFile()">保存并发布</button>
+          <button class="btn-danger btn-sm" onclick="deleteFile()">删除</button>
+        </div>
+        <div class="editor-panes">
+          <textarea id="editor" spellcheck="false"
+            oninput="renderPreview()" placeholder="在这里写 Markdown..."></textarea>
+          <div class="preview" id="preview"></div>
+        </div>
+      </div>
+      <div class="empty-state" id="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>从左侧选择文件，或新建文章</span>
+      </div>
+    </div>
+  </div>
+  <div class="statusbar info" id="statusbar">就绪</div>
+</div>
+
+<!-- New file dialog -->
+<div class="dialog-overlay" id="new-dialog">
+  <div class="dialog">
+    <h3>新建文章</h3>
+    <label>分区</label>
+    <select id="new-section">
+      <option value="ai">AI 平台</option>
+      <option value="notes">编程笔记</option>
+      <option value="projects">项目实战</option>
+    </select>
+    <label>文件名（英文，不含 .md）</label>
+    <input type="text" id="new-slug" placeholder="例如：deepseek">
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn-primary" style="flex:1" onclick="createFile()">创建</button>
+      <button class="btn-secondary" style="flex:1" onclick="closeNew()">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const OWNER = 'keane11'
+const REPO  = 'keanedata'
+const BRANCH = 'main'
+
+const SECTIONS = {
+  ai:       { label: 'AI 平台',  path: 'docs/ai' },
+  notes:    { label: '编程笔记', path: 'docs/notes' },
+  projects: { label: '项目实战', path: 'docs/projects' },
+}
+
+let token = '', currentFile = null, currentSha = null
+
+// ── Auth ──────────────────────────────────────────────────────────────
+async function login() {
+  const t = document.getElementById('token-input').value.trim()
+  if (!t) return
+  setStatus('验证中...', 'info')
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {
+    headers: { Authorization: `token ${t}` }
+  })
+  if (!res.ok) {
+    document.getElementById('login-err').textContent = 'Token 无效或无权限，请检查后重试。'
+    setStatus('', 'info'); return
+  }
+  token = t
+  sessionStorage.setItem('gh_token', t)
+  showApp()
+}
+
+function logout() {
+  sessionStorage.removeItem('gh_token')
+  token = ''; location.reload()
+}
+
+// ── Init ──────────────────────────────────────────────────────────────
+window.onload = async () => {
+  const saved = sessionStorage.getItem('gh_token')
+  if (saved) { token = saved; showApp() }
+}
+
+async function showApp() {
+  document.getElementById('login').style.display = 'none'
+  document.getElementById('app').style.display   = 'flex'
+  await loadFileList()
+}
+
+// ── File list ─────────────────────────────────────────────────────────
+async function loadFileList() {
+  const list = document.getElementById('file-list')
+  list.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13px;">加载中...</div>'
+
+  let html = ''
+  for (const [key, sec] of Object.entries(SECTIONS)) {
+    const res = await api(`contents/${sec.path}`)
+    const files = (await res.json())
+      .filter(f => f.name.endsWith('.md') && f.name !== 'index.md')
+      .sort((a, b) => a.name.localeCompare(b.name))
+
+    html += `<div class="sidebar-section">
+      <div class="sidebar-section-title">${sec.label}</div>`
+    for (const f of files) {
+      const label = f.name.replace('.md', '')
+      html += `<div class="sidebar-item" onclick="openFile('${sec.path}/${f.name}','${f.sha}',this)"
+        title="${f.name}">📄 ${label}</div>`
+    }
+    html += `</div>`
+  }
+  list.innerHTML = html
+}
+
+// ── Open file ─────────────────────────────────────────────────────────
+async function openFile(path, sha, el) {
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'))
+  el.classList.add('active')
+  setStatus('加载文件...', 'info')
+
+  const res = await api(`contents/${path}`)
+  const data = await res.json()
+  const content = atob(data.content.replace(/\n/g, ''))
+
+  currentFile = path
+  currentSha  = data.sha
+  document.getElementById('editor').value = content
+  document.getElementById('file-badge').textContent = path.split('/').pop()
+  document.getElementById('commit-msg').value = ''
+  renderPreview()
+  showEditor()
+  setStatus(`已打开：${path}`, 'ok')
+}
+
+// ── Save file ─────────────────────────────────────────────────────────
+async function saveFile() {
+  if (!currentFile) return
+  const content = document.getElementById('editor').value
+  const msg = document.getElementById('commit-msg').value.trim()
+        || `docs: update ${currentFile.split('/').pop()}`
+
+  setStatus('提交中...', 'info')
+  const body = {
+    message: msg,
+    content: btoa(unescape(encodeURIComponent(content))),
+    branch:  BRANCH,
+  }
+  if (currentSha) body.sha = currentSha
+
+  const res = await api(`contents/${currentFile}`, 'PUT', body)
+  if (res.ok) {
+    const data = await res.json()
+    currentSha = data.content.sha
+    setStatus(`已发布：${msg}`, 'ok')
+  } else {
+    const err = await res.json()
+    setStatus('保存失败：' + (err.message || res.status), 'err')
+  }
+}
+
+// ── Delete file ───────────────────────────────────────────────────────
+async function deleteFile() {
+  if (!currentFile || !currentSha) return
+  if (!confirm(`确定删除 ${currentFile.split('/').pop()} 吗？此操作不可撤销。`)) return
+
+  setStatus('删除中...', 'info')
+  const res = await api(`contents/${currentFile}`, 'DELETE', {
+    message: `docs: delete ${currentFile.split('/').pop()}`,
+    sha: currentSha,
+    branch: BRANCH,
+  })
+  if (res.ok) {
+    currentFile = null; currentSha = null
+    hideEditor()
+    await loadFileList()
+    setStatus('已删除', 'ok')
+  } else {
+    setStatus('删除失败', 'err')
+  }
+}
+
+// ── New file ──────────────────────────────────────────────────────────
+function openNew()  { document.getElementById('new-dialog').classList.add('open') }
+function closeNew() { document.getElementById('new-dialog').classList.remove('open') }
+
+async function createFile() {
+  const section = document.getElementById('new-section').value
+  const slug    = document.getElementById('new-slug').value.trim().toLowerCase().replace(/\s+/g, '-')
+  if (!slug) { alert('请输入文件名'); return }
+
+  const path    = `${SECTIONS[section].path}/${slug}.md`
+  const date    = new Date().toISOString().slice(0, 10)
+  const title   = slug.charAt(0).toUpperCase() + slug.slice(1)
+  const tpl     = `---\ntitle: ${title}\ndate: ${date}\n---\n\n# ${title}\n\n> 简介：一句话介绍这篇文章。\n\n## 章节一\n\n内容...\n`
+
+  setStatus('创建中...', 'info')
+  const res = await api(`contents/${path}`, 'PUT', {
+    message: `docs: create ${slug}.md`,
+    content: btoa(unescape(encodeURIComponent(tpl))),
+    branch:  BRANCH,
+  })
+  if (res.ok) {
+    const data = await res.json()
+    closeNew()
+    document.getElementById('new-slug').value = ''
+    await loadFileList()
+    // 自动打开刚创建的文件
+    currentFile = path
+    currentSha  = data.content.sha
+    document.getElementById('editor').value = tpl
+    document.getElementById('file-badge').textContent = `${slug}.md`
+    document.getElementById('commit-msg').value = ''
+    renderPreview()
+    showEditor()
+    // 高亮侧边栏
+    document.querySelectorAll('.sidebar-item').forEach(el => {
+      if (el.title === `${slug}.md`) el.classList.add('active')
+    })
+    setStatus(`已创建：${slug}.md`, 'ok')
+  } else {
+    const err = await res.json()
+    setStatus('创建失败：' + (err.message || '文件可能已存在'), 'err')
+  }
+}
+
+// ── Markdown preview ──────────────────────────────────────────────────
+function renderPreview() {
+  const md = document.getElementById('editor').value
+  document.getElementById('preview').innerHTML = parseMarkdown(md)
+}
+
+function parseMarkdown(md) {
+  return md
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```(\w*)\n([\s\S]*?)```/g, (_,_l,c)=>`<pre><code>${c.replace(/&lt;/g,'<').replace(/&gt;/g,'>')}</code></pre>`)
+    .replace(/^#{3} (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^#{2} (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,    '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,     '<em>$1</em>')
+    .replace(/`([^`]+)`/g,     '<code>$1</code>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
+    .replace(/^> (.+)$/gm,   '<blockquote>$1</blockquote>')
+    .replace(/^---$/gm,       '<hr>')
+    .replace(/^\| (.+) \|$/gm, r => {
+      const cells = r.slice(2,-2).split(' | ')
+      return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>'
+    })
+    .replace(/(<tr>.*<\/tr>\n?)+/g, s => `<table>${s}</table>`)
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, s => `<ul>${s}</ul>`)
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[a-z])/gm, '')
+    .replace(/(<\/p><p>)+/g, '</p><p>')
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────
+function api(path, method = 'GET', body) {
+  return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/${path}`, {
+    method,
+    headers: {
+      Authorization: `token ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/vnd.github+json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+}
+
+function showEditor() {
+  document.getElementById('editor-wrap').style.display = 'flex'
+  document.getElementById('empty-state').style.display = 'none'
+}
+function hideEditor() {
+  document.getElementById('editor-wrap').style.display = 'none'
+  document.getElementById('empty-state').style.display = 'flex'
+}
+function setStatus(msg, type) {
+  const el = document.getElementById('statusbar')
+  el.textContent = msg
+  el.className   = `statusbar ${type}`
+}
+
+// Enter key submits login
+document.getElementById('token-input')
+  .addEventListener('keydown', e => e.key === 'Enter' && login())
+document.getElementById('new-slug')
+  .addEventListener('keydown', e => e.key === 'Enter' && createFile())
+</script>
+</body>
+</html>
