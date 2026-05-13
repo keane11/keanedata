@@ -1,0 +1,87 @@
+/* 品牌主色：靛蓝 → 青色渐变 */
+:root {
+  --vp-c-brand-1: #4f6ef7;
+  --vp-c-brand-2: #3b5bdb;
+  --vp-c-brand-3: #2f4ac7;
+  --vp-c-brand-soft: rgba(79, 110, 247, 0.12);
+
+  /* 首页 hero 渐变背景 */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #4f6ef7 20%, #00b4d8 80%);
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    #4f6ef7 30%,
+    #00b4d8 70%
+  );
+  --vp-home-hero-image-filter: blur(44px);
+}
+
+/* 暗色模式下微调亮度 */
+.dark {
+  --vp-c-brand-1: #7b97fa;
+  --vp-c-brand-2: #4f6ef7;
+  --vp-c-brand-3: #3b5bdb;
+  --vp-c-brand-soft: rgba(123, 151, 250, 0.14);
+}
+
+/* 导航栏底部细线，增加层次感 */
+.VPNav {
+  border-bottom: 1px solid var(--vp-c-divider) !important;
+}
+
+/* 代码块：圆角 + 细线边框 */
+div[class*='language-'] {
+  border-radius: 10px !important;
+  border: 1px solid var(--vp-c-divider);
+}
+
+/* 行内代码：轻背景 */
+:not(pre) > code {
+  background-color: var(--vp-c-brand-soft) !important;
+  color: var(--vp-c-brand-1) !important;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* 首页 feature 卡片：hover 上浮 */
+.VPFeature {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.VPFeature:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(79, 110, 247, 0.15);
+}
+
+/* 表格：条纹 + 边框 */
+.vp-doc table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.vp-doc table th {
+  background-color: var(--vp-c-brand-soft);
+  font-weight: 600;
+}
+.vp-doc table tr:nth-child(even) {
+  background-color: var(--vp-c-bg-soft);
+}
+.vp-doc table th,
+.vp-doc table td {
+  border: 1px solid var(--vp-c-divider);
+  padding: 10px 14px;
+}
+
+/* 引用块：左侧品牌色竖线 */
+.vp-doc blockquote {
+  border-left: 4px solid var(--vp-c-brand-1);
+  background-color: var(--vp-c-brand-soft);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+}
+
+/* 文章内容最大宽度，阅读更舒适 */
+.vp-doc {
+  max-width: 780px;
+}
