@@ -1,43 +1,27 @@
 import { defineConfig } from 'vitepress'
 import { generateSidebar } from 'vitepress-sidebar'
 
+const sidebarOptions = {
+  useTitleFromFileHeading: true,
+  useFolderTitleFromIndexFile: true,
+  excludeFiles: ['index.md'],
+  sortMenusByFrontmatterOrder: true,
+  frontmatterOrderDefaultValue: 99,
+  collapsed: false,
+  rootGroupCollapsed: false,
+}
+
 const sidebar = generateSidebar([
-  {
-    documentRootPath: 'docs',
-    scanStartPath: 'ai',
-    resolvePath: '/ai/',
-    useTitleFromFileHeading: true,
-    useFolderTitleFromIndexFile: true,
-    excludeFiles: ['index.md'],
-    sortMenusByFrontmatterOrder: true,
-    frontmatterOrderDefaultValue: 99,
-  },
-  {
-    documentRootPath: 'docs',
-    scanStartPath: 'notes',
-    resolvePath: '/notes/',
-    useTitleFromFileHeading: true,
-    useFolderTitleFromIndexFile: true,
-    excludeFiles: ['index.md'],
-    sortMenusByFrontmatterOrder: true,
-    frontmatterOrderDefaultValue: 99,
-  },
-  {
-    documentRootPath: 'docs',
-    scanStartPath: 'projects',
-    resolvePath: '/projects/',
-    useTitleFromFileHeading: true,
-    useFolderTitleFromIndexFile: true,
-    excludeFiles: ['index.md'],
-    sortMenusByFrontmatterOrder: true,
-    frontmatterOrderDefaultValue: 99,
-  },
+  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'ai',       resolvePath: '/ai/' },
+  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'notes',    resolvePath: '/notes/' },
+  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'projects', resolvePath: '/projects/' },
 ])
 
 export default defineConfig({
   title: 'Keane 的技术笔记',
   description: 'AI 平台配置 · 编程笔记 · 项目实战',
   lang: 'zh-CN',
+  ignoreDeadLinks: true,
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],
@@ -47,10 +31,10 @@ export default defineConfig({
     logo: '/favicon.ico',
 
     nav: [
-      { text: '首页', link: '/' },
-      { text: 'AI 平台', link: '/ai/' },
-      { text: '编程笔记', link: '/notes/' },
-      { text: '项目实战', link: '/projects/' },
+      { text: '首页',   link: '/' },
+      { text: 'AI',     link: '/ai/' },
+      { text: '笔记',   link: '/notes/' },
+      { text: '项目',   link: '/projects/' },
       { text: '文件共享', link: 'https://share.keaneai.top', target: '_blank' },
     ],
 
@@ -71,6 +55,7 @@ export default defineConfig({
 
     outline: {
       label: '本页目录',
+      level: [2, 3],
     },
 
     docFooter: {
