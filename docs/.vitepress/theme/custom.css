@@ -117,3 +117,8 @@ div[class*='language-'] {
 .vp-doc {
   max-width: 780px;
 }
+
+/* ── 隐藏标题锚点 # ── */
+.vp-doc .header-anchor {
+  display: none;
+}
