@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 import { generateSidebar } from 'vitepress-sidebar'
 
 const sidebarOptions = {
+  useTitleFromFrontmatter: true,
   useTitleFromFileHeading: true,
   useFolderTitleFromIndexFile: true,
   excludeFiles: ['index.md'],
@@ -32,9 +33,9 @@ export default defineConfig({
 
     nav: [
       { text: '首页',   link: '/' },
-      { text: 'AI',     link: '/ai/' },
-      { text: '笔记',   link: '/notes/' },
-      { text: '项目',   link: '/projects/' },
+      { text: 'AI 平台',  link: '/ai/' },
+      { text: '编程笔记', link: '/notes/' },
+      { text: '项目实战', link: '/projects/' },
       { text: '文件共享', link: 'https://share.keaneai.top', target: '_blank' },
     ],
 
