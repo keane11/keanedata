@@ -111,6 +111,94 @@ response = client.chat.completions.create(
 )
 ```
 
+## Codex CLI
+
+Codex CLI 是 OpenAI 推出的终端编程助手，核心特色是精细的「审批模式」控制 AI 操作权限。安装方式见 [WSL 安装 AI CLI 工具](./wsl_ai_cli_教程)。
+
+### 常用命令
+
+```bash
+# 启动交互式会话
+codex
+
+# 单次任务描述
+codex "列出当前目录下所有大于 1MB 的文件，按大小排序"
+
+# 将文件内容作为输入
+codex "重构这个函数，减少嵌套层级，保持功能不变" < utils.py
+
+# 指定模型（默认 o4-mini，o3 推理更强）
+codex --model o3 "分析这段代码的时间复杂度，给出最优解"
+
+# 指定审批模式（见下方说明）
+codex --approval-mode suggest   "优化这个 SQL 查询"
+codex --approval-mode auto-edit "为所有函数添加 Python 类型注解"
+codex --approval-mode full-auto "运行测试并自动修复所有失败用例"
+
+# 指定工作目录
+codex --cwd /path/to/project "检查项目依赖有没有已知安全漏洞"
+
+# 静默模式（减少交互提示）
+codex --quiet "生成标准 README.md"
+```
+
+### 审批模式详解
+
+| 模式 | 文件修改 | 命令执行 | 适用场景 |
+|------|---------|---------|---------|
+| `suggest`（默认） | 只给建议，不执行 | 不执行 | 学习、代码评审 |
+| `auto-edit` | 自动修改文件 | 执行前需确认 | 日常开发，有安全兜底 |
+| `full-auto` | 全自动 | 全自动 | CI、脚本、测试修复 |
+
+### 配置文件（codex.yaml）
+
+在项目根目录创建 `codex.yaml`：
+
+```yaml
+# 默认审批模式
+approvalMode: auto-edit
+
+# 默认模型
+model: o4-mini
+
+# 项目上下文（会附加到每次请求）
+instructions: |
+  这是一个 Python 3.11 项目，使用 FastAPI 框架。
+  代码规范：类型注解全覆盖，black 格式化，ruff 检查。
+  测试用 pytest，覆盖率要求 80% 以上。
+
+# 沙箱策略（full-auto 时限制可执行的命令）
+sandbox:
+  allowedCommands:
+    - pytest
+    - ruff
+    - black
+    - git status
+    - git diff
+```
+
+### 实用工作流
+
+```bash
+# 自动修复测试失败
+codex --approval-mode full-auto "运行 pytest，修复所有失败的测试"
+
+# 代码审查 + 修复
+codex "对这次 git diff 做 code review，找出 Bug 并自动修复" <<< "$(git diff)"
+
+# 迁移适配
+codex --approval-mode auto-edit \
+  "把所有 requests 库的调用改为 httpx 异步写法"
+
+# 安全扫描
+codex --approval-mode suggest \
+  "扫描整个项目，列出所有可能的 SQL 注入、XSS、硬编码密钥问题"
+
+# 文档生成
+codex --approval-mode auto-edit \
+  "为 src/ 下所有没有 docstring 的公开函数生成文档字符串"
+```
+
 ## 费用参考（2025年）
 
 | 模型 | 输入（每百万 token） | 输出（每百万 token） |

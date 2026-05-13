@@ -58,36 +58,152 @@ Claude 支持超长上下文（Opus 支持 200K token），适合：
 找出至少 2 个可以改进的地方并修正。
 ```
 
-## Claude Code
+## Claude Code CLI
 
-Claude Code 是 Anthropic 官方 CLI 工具，在终端直接调用 Claude 协助编程。
+Claude Code 是 Anthropic 官方 CLI 工具，在终端直接调用 Claude 读写文件、运行命令、完成复杂多步骤编程任务。安装方式见 [WSL 安装 AI CLI 工具](./wsl_ai_cli_教程)。
 
-### 安装与启动
-
-```bash
-npm install -g @anthropic-ai/claude-code
-claude
-```
-
-### 常用场景
+### 常用命令
 
 ```bash
-# 直接提问（不进入交互模式）
-claude -p "解释这段代码的作用" < main.py
+# 启动交互式会话（在项目目录下运行，自动加载结构）
+cd my-project && claude
 
-# 让它自主完成任务
+# 单次任务，执行后退出
 claude "帮我写单元测试，覆盖 utils.py 里所有函数"
 
-# 代码 Review
-claude "review 这次的改动，重点看安全问题"
+# 将文件内容作为上下文
+claude "解释这段代码的逻辑，重点讲并发问题" < main.py
+
+# 非交互输出（适合脚本、管道）
+claude --print "生成一份标准 .gitignore（Python 项目）"
+
+# 继续上一次会话
+claude --continue
+
+# 恢复指定会话
+claude --resume <session-id>
+
+# 指定模型
+claude --model claude-opus-4-7 "做代码架构评审"
+
+# 跳过所有确认（自动化脚本场景，慎用）
+claude --dangerously-skip-permissions "重构整个 utils 模块"
 ```
 
 ### 权限模式
 
-| 模式 | 说明 |
+| 模式 | 行为 |
 |------|------|
-| 默认 | 每次修改文件前询问确认 |
-| `--dangerously-skip-permissions` | 自动执行所有操作（慎用） |
+| 默认 | 读取文件自由，修改/执行前逐步确认 |
+| `--dangerously-skip-permissions` | 全自动执行，无需确认 |
+
+### 交互模式斜杠命令
+
+| 命令 | 功能 |
+|------|------|
+| `/help` | 查看所有可用指令 |
+| `/clear` | 清空当前对话上下文 |
+| `/compact` | 压缩上下文，节省 token |
+| `/model` | 切换模型 |
+| `/cost` | 查看本次会话 token 用量 |
+| `/review` | 对当前改动做代码审查 |
+| `/memory` | 管理跨会话记忆 |
+| `/init` | 在项目根生成 `CLAUDE.md` |
+| `/quit` | 退出 |
+
+### CLAUDE.md 项目配置
+
+在项目根目录创建 `CLAUDE.md`，Claude Code 每次启动时自动读取，相当于给 AI 的永久系统提示：
+
+```markdown
+# 项目简介
+这是一个基于 FastAPI 的后端服务，使用 PostgreSQL。
+
+# 代码规范
+- Python 3.11+，类型注解全覆盖
+- 函数命名：snake_case；类命名：PascalCase
+- 不写注释，让代码自解释
+- 测试文件放 tests/ 目录，使用 pytest
+
+# 禁止操作
+- 不要修改 alembic/versions/ 下的文件
+- 不要安装新依赖，需要时先提出
+- 提交前必须运行 ruff check . && pytest
+
+# 常用命令
+- 启动开发服务器：uvicorn main:app --reload
+- 运行测试：pytest -v
+- 数据库迁移：alembic upgrade head
+```
+
+### MCP 服务器
+
+MCP（Model Context Protocol）让 Claude Code 连接外部数据源和工具：
+
+```bash
+# 在 ~/.claude/settings.json 配置 MCP 服务器
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "ghp_xxx" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres",
+               "postgresql://user:pass@localhost/mydb"]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/user"]
+    }
+  }
+}
+```
+
+配置后，Claude Code 可以直接查询数据库、读取 GitHub Issues、访问指定文件系统路径。
+
+### Hooks（钩子）
+
+在工具调用前后自动执行 Shell 命令，适合格式化、测试、通知等场景：
+
+```json
+// ~/.claude/settings.json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ruff format $CLAUDE_FILE_PATH 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+可用事件：`PreToolUse`、`PostToolUse`、`Stop`（会话结束时）。
+
+### 实用工作流
+
+```bash
+# 1. 让 Claude 给整个 PR 写 commit message
+git diff HEAD~1 | claude --print "根据这个 diff 写一条规范的 git commit message"
+
+# 2. 批量处理文件
+ls src/*.py | xargs -I{} claude --print "检查 {} 中有没有 SQL 注入风险" > security_report.txt
+
+# 3. 生成测试覆盖
+claude "分析 src/ 下所有函数，为没有测试的函数生成 pytest 用例"
+
+# 4. 代码库问答（不修改文件）
+claude --print "这个项目用了哪些设计模式？举具体例子"
+```
 
 ## API 快速上手
 

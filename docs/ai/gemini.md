@@ -64,6 +64,98 @@ response = chat.send_message("解释 Python 的 GIL 是什么")
 print(response.text)
 ```
 
+## Gemini CLI
+
+Gemini CLI 是 Google 推出的终端 AI 助手，最大亮点是支持 100 万 token 上下文，适合大型代码库分析。安装方式见 [WSL 安装 AI CLI 工具](./wsl_ai_cli_教程)。
+
+### 常用命令
+
+```bash
+# 启动交互式会话（首次运行触发 Google 账号 OAuth 登录）
+gemini
+
+# 单次提问
+gemini "解释 Python GIL 对多线程的影响"
+
+# 读取文件内容作为上下文
+gemini "总结这个项目的整体架构" < README.md
+
+# 传入大量文件（发挥超长上下文优势）
+cat src/**/*.py | gemini "找出这些文件中重复的业务逻辑，给出重构建议"
+
+# 指定模型
+gemini --model gemini-2.5-pro   "对整个代码库做全面性能分析"
+gemini --model gemini-2.5-flash "快速生成单元测试框架"
+
+# 关闭联网搜索（仅使用输入的上下文）
+gemini --no-search "解释这段正则表达式"
+
+# JSON 输出（适合脚本处理）
+gemini --json "列出这段代码的所有函数名及其功能描述"
+
+# 调整输出长度
+gemini --max-output-tokens 4096 "详细讲解这个算法的时间复杂度"
+```
+
+### 交互模式斜杠命令
+
+| 命令 | 功能 |
+|------|------|
+| `/help` | 查看所有指令 |
+| `/clear` | 清空当前对话 |
+| `/model` | 切换模型 |
+| `/tools` | 查看已启用的工具列表 |
+| `/memory` | 管理 Gemini 的长期记忆 |
+| `/quit` | 退出 |
+
+### GEMINI.md 项目配置
+
+类似 Claude 的 CLAUDE.md，在项目根目录创建 `GEMINI.md` 作为持久化上下文：
+
+```markdown
+# 项目背景
+这是一个嵌入式固件项目，目标平台 GD32VF103（RISC-V）。
+
+# 代码规范
+- C11 标准，不使用动态内存分配
+- 函数名 snake_case，宏名 UPPER_CASE
+- 所有寄存器访问必须加 volatile
+
+# 关键约束
+- Flash 限制 128KB，RAM 限制 32KB
+- 不依赖 C 标准库（-nostdlib）
+```
+
+### MCP 工具支持
+
+Gemini CLI 支持 MCP（Model Context Protocol），配置方式与 Claude Code 类似：
+
+```json
+// ~/.gemini/settings.json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/user/projects"]
+    }
+  }
+}
+```
+
+### 超长上下文实战
+
+```bash
+# 分析整个仓库（100 万 token 足够加载大型项目）
+find . -name "*.c" -o -name "*.h" | xargs cat | \
+  gemini "分析这个嵌入式项目的驱动层架构，找出潜在的内存安全问题"
+
+# 对比两个版本的差异
+git diff v1.0..v2.0 | gemini "总结这次版本更新的主要变化和风险点"
+
+# 从文档生成代码
+cat spec/*.md | gemini "根据这份需求文档生成对应的 API 接口框架代码（Python FastAPI）"
+```
+
 ## 免费额度参考（2025年）
 
 | 模型 | 免费 RPM | 免费 TPD |
