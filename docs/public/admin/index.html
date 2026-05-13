@@ -162,6 +162,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div class="editor-area">
       <div class="editor-toolbar" id="toolbar" style="display:none">
         <span class="path-badge" id="path-badge"></span>
+        <input id="title-input" type="text" class="toolbar-input"
+          placeholder="博客显示标题（修改后保存生效）"
+          style="flex:2;min-width:150px;font-weight:500"
+          title="修改这里即可改变文章在博客侧边栏和页面中显示的名称">
         <label style="font-size:12px;color:var(--muted);margin-bottom:0;white-space:nowrap">排序</label>
         <input id="order-input" type="number" class="toolbar-input" placeholder="99" min="1" max="999" title="数字越小越靠前">
         <input id="commit-msg" type="text" class="toolbar-input" placeholder="提交说明（留空自动生成）">
@@ -365,9 +369,10 @@ async function loadList(){
     html+=`<div class="sec-title"><span>${sec.label}</span></div>`
     if(!files.length) html+=`<div style="padding:3px 14px 6px;font-size:12px;color:var(--muted)">暂无文章</div>`
     for(const f of files){
-      const name=f.name.replace('.md','')
+      const raw=f.name.replace('.md','')
+      const display=raw.replace(/_/g,' ').replace(/-/g,' ')
       html+=`<div class="file-item" data-path="${sec.path}/${f.name}" data-sha="${f.sha}"
-        onclick="openFile(this)" title="${f.name}">📄 <span class="file-name">${name}</span></div>`
+        onclick="openFile(this)" title="${f.name}">📄 <span class="file-name">${display}</span></div>`
     }
   }
 
@@ -411,14 +416,12 @@ function loadEditor(path,sha,content,showOrder){
   document.getElementById('editor').value=content
   document.getElementById('path-badge').textContent=path
   document.getElementById('commit-msg').value=''
-  // order
   const fm=parseFrontmatter(content)
-  const orderWrap=document.getElementById('order-input').parentElement
+  // title
+  document.getElementById('title-input').value=fm.title||''
+  // order
   document.getElementById('order-input').style.display=showOrder?'':'none'
-  document.querySelector('label[for-order]') // handled below
-  if(showOrder){
-    document.getElementById('order-input').value=fm.order||''
-  }
+  if(showOrder) document.getElementById('order-input').value=fm.order||''
   document.getElementById('del-btn').style.display=showOrder?'':'none'
   renderPreview()
   document.getElementById('toolbar').style.display='flex'
@@ -439,15 +442,14 @@ function parseFrontmatter(content){
 }
 
 function setFrontmatterOrder(content,order){
-  const val=String(parseInt(order)||99)
-  if(!content.startsWith('---')){
-    return`---\norder: ${val}\n---\n\n${content}`
-  }
+  return setFrontmatterField(content,'order',String(parseInt(order)||99))
+}
+function setFrontmatterField(content,key,value){
+  if(!content.startsWith('---'))return`---\n${key}: ${value}\n---\n\n${content}`
   const end=content.indexOf('---',3);if(end===-1)return content
-  const yaml=content.slice(3,end).trim()
-  const lines=yaml.split('\n')
-  const idx=lines.findIndex(l=>l.startsWith('order:'))
-  if(idx>=0)lines[idx]=`order: ${val}`;else lines.push(`order: ${val}`)
+  const lines=content.slice(3,end).trim().split('\n')
+  const idx=lines.findIndex(l=>l.startsWith(key+':'))
+  if(idx>=0)lines[idx]=`${key}: ${value}`;else lines.push(`${key}: ${value}`)
   return`---\n${lines.join('\n')}\n---${content.slice(end+3)}`
 }
 
@@ -456,12 +458,15 @@ async function saveFile(){
   if(!curPath)return
   const btn=document.getElementById('save-btn');btn.disabled=true
   let content=document.getElementById('editor').value
+  // update title in frontmatter
+  const titleVal=document.getElementById('title-input').value.trim()
+  if(titleVal) content=setFrontmatterField(content,'title',titleVal)
   // update order in frontmatter if visible
   const orderInput=document.getElementById('order-input')
   if(orderInput.style.display!=='none'&&orderInput.value){
     content=setFrontmatterOrder(content,orderInput.value)
-    document.getElementById('editor').value=content
   }
+  document.getElementById('editor').value=content
   const msg=document.getElementById('commit-msg').value.trim()||`docs: update ${curPath.split('/').pop()}`
   setStatus('提交中…','info')
   const body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:BRANCH}
@@ -470,7 +475,15 @@ async function saveFile(){
   btn.disabled=false
   if(r.ok){
     const d=await r.json();curSha=d.content.sha
-    await loadList();setStatus(`✓ 已发布：${msg}`,'ok')
+    await loadList()
+    // re-highlight active file and update its sidebar label with the saved title
+    document.querySelectorAll('.file-item').forEach(i=>{
+      if(i.dataset.path===curPath){
+        i.classList.add('active')
+        if(titleVal){const fn=i.querySelector('.file-name');if(fn)fn.textContent=titleVal}
+      }
+    })
+    setStatus(`✓ 已发布：${msg}`,'ok')
   }else{
     const e=await r.json().catch(()=>({}))
     setStatus('保存失败：'+(e.message||r.status),'err')
