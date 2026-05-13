@@ -84,17 +84,21 @@ div[class*='language-'] {
   box-shadow: 0 8px 24px var(--vp-c-brand-soft);
 }
 
-/* ── 表格 ── */
+/* ── 表格：宽表格横向滚动 ── */
 .vp-doc table {
-  display: table;
-  width: 100%;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-collapse: collapse;
   border-radius: 8px;
-  overflow: hidden;
+  max-width: 100%;
+  width: max-content;
+  min-width: 100%;
 }
 .vp-doc table th {
   background-color: var(--vp-c-brand-soft);
   font-weight: 600;
+  white-space: nowrap;
 }
 .vp-doc table tr:nth-child(even) {
   background-color: var(--vp-c-bg-soft);
@@ -102,7 +106,8 @@ div[class*='language-'] {
 .vp-doc table th,
 .vp-doc table td {
   border: 1px solid var(--vp-c-divider);
-  padding: 10px 14px;
+  padding: 8px 14px;
+  vertical-align: middle;
 }
 
 /* ── 引用块 ── */
@@ -113,9 +118,9 @@ div[class*='language-'] {
   padding: 12px 16px;
 }
 
-/* ── 文章宽度 ── */
+/* ── 文章内容不限制宽度，让 VitePress 布局自己管 ── */
 .vp-doc {
-  max-width: 780px;
+  max-width: none;
 }
 
 /* ── 隐藏标题锚点 # ── */
