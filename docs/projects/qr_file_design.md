@@ -1,5 +1,5 @@
 ---
-title: qr file design
+title: QR 共享文件夹设计方案
 ---
 
 # QR 共享文件夹 — 设计方案
