@@ -17,14 +17,20 @@ features:
   - icon: 🤖
     title: AI 平台配置
     details: Claude、OpenAI 等 AI 平台的配置教程和使用技巧
+    link: /ai/
+    linkText: 查看笔记
 
   - icon: 📝
     title: 编程笔记
     details: Python、Docker、Linux 等日常开发笔记
+    link: /notes/
+    linkText: 查看笔记
 
   - icon: 🚀
     title: 项目实战
     details: 从零搭建的项目记录，包含完整的思路和踩坑经验
+    link: /projects/
+    linkText: 查看项目
 
   - icon: 📁
     title: 文件共享
