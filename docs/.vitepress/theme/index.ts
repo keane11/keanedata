@@ -3,6 +3,7 @@ import { h } from 'vue'
 import ThemePicker from './ThemePicker.vue'
 import ReadingTime from './ReadingTime.vue'
 import RecentPosts from './RecentPosts.vue'
+import AdminEntry from './AdminEntry.vue'
 import './custom.css'
 
 export default {
@@ -12,6 +13,7 @@ export default {
       'nav-bar-content-after': () => h(ThemePicker),
       'doc-before': () => h(ReadingTime),
       'home-features-after': () => h(RecentPosts),
+      'layout-bottom': () => h(AdminEntry),
     })
   },
 }
