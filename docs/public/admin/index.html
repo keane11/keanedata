@@ -178,6 +178,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
         <input id="date-input" type="date" class="toolbar-input" style="width:140px;flex:0">
         <input id="commit-msg" type="text" class="toolbar-input" placeholder="提交说明（留空自动生成）">
         <button class="btn-p btn-sm" id="save-btn" onclick="saveFile()">保存发布</button>
+        <button class="btn-s btn-sm" id="dl-btn" onclick="downloadFile()">下载 MD</button>
         <button class="btn-d btn-sm" id="del-btn" onclick="deleteFile()">删除</button>
       </div>
       <div class="panes" id="panes" style="display:none">
@@ -480,6 +481,18 @@ function setFrontmatterField(content,key,value){
   const idx=lines.findIndex(l=>l.startsWith(key+':'))
   if(idx>=0)lines[idx]=`${key}: ${value}`;else lines.push(`${key}: ${value}`)
   return`---\n${lines.join('\n')}\n---${content.slice(end+3)}`
+}
+
+// ── Download ──────────────────────────────────────────────────────────
+function downloadFile(){
+  if(!curPath)return
+  const content=document.getElementById('editor').value
+  const fileName=curPath.split('/').pop()
+  const blob=new Blob([content],{type:'text/markdown;charset=utf-8'})
+  const url=URL.createObjectURL(blob)
+  const a=document.createElement('a')
+  a.href=url;a.download=fileName;a.click()
+  URL.revokeObjectURL(url)
 }
 
 // ── Save ──────────────────────────────────────────────────────────────
