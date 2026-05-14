@@ -270,8 +270,19 @@ const PAGES={
   '项目概览': 'docs/projects/index.md',
 }
 const STORE_KEY='blog_admin_enc'
+const TITLE_CACHE_KEY='blog_admin_titles'
 let token='', curPath='', curSha='', uploadContent=''
 const titleCache={}   // path → frontmatter title，用于侧边栏刷新后保留标题
+// 从 sessionStorage 恢复上次会话的标题缓存（刷新页面内仍有效）
+try{Object.assign(titleCache,JSON.parse(sessionStorage.getItem(TITLE_CACHE_KEY)||'{}'))}catch{}
+function setTitleCache(path,title){
+  titleCache[path]=title
+  try{sessionStorage.setItem(TITLE_CACHE_KEY,JSON.stringify(titleCache))}catch{}
+}
+function delTitleCache(path){
+  delete titleCache[path]
+  try{sessionStorage.setItem(TITLE_CACHE_KEY,JSON.stringify(titleCache))}catch{}
+}
 
 // ── Crypto ────────────────────────────────────────────────────────────
 async function deriveKey(pw, salt){
@@ -354,7 +365,9 @@ async function enterApp(){
 // ── API ───────────────────────────────────────────────────────────────
 function api(path,method='GET',body){
   return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/${path}`,{
-    method,headers:{Authorization:`token ${token}`,'Content-Type':'application/json',Accept:'application/vnd.github+json'},
+    method,
+    cache:method==='GET'?'no-store':'default',
+    headers:{Authorization:`token ${token}`,'Content-Type':'application/json',Accept:'application/vnd.github+json'},
     body:body?JSON.stringify(body):undefined,
   })
 }
@@ -433,7 +446,7 @@ function loadEditor(path,sha,content,showOrder){
   document.getElementById('title-input').value=titleVal
   // 仅文章（showOrder）才更新 titleCache 和侧边栏；页面配置项标签固定不变
   if(showOrder){
-    titleCache[path]=titleVal
+    setTitleCache(path,titleVal)
     document.querySelectorAll('.file-item').forEach(i=>{
       if(i.dataset.path===path){const fn=i.querySelector('.file-name');if(fn)fn.textContent=titleVal}
     })
@@ -550,12 +563,12 @@ async function saveFile(){
     const slug=fileName.replace(/\.md$/,'')
     await removeFromSectionIndex(oldKey,slug)
     await updateSectionIndex(newKey,slug,titleVal||slug.replace(/_/g,' ').replace(/-/g,' '))
-    delete titleCache[curPath]
+    delTitleCache(curPath)
   }
 
   curPath=targetPath; curSha=newSha
   document.getElementById('path-badge').textContent=curPath
-  if(titleVal) titleCache[curPath]=titleVal
+  if(titleVal) setTitleCache(curPath,titleVal)
 
   await loadList()
   document.querySelectorAll('.file-item').forEach(i=>{
