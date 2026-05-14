@@ -2,83 +2,83 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Commands
+## 常用命令
 
 ```bash
-npm run docs:dev      # Start local dev server (hot reload)
-npm run docs:build    # Build to docs/.vitepress/dist/
-npm run docs:preview  # Preview production build locally
-npm run new <section> <slug>  # Scaffold a new article
-# Sections: ai | notes | projects
-# Example: npm run new notes fastapi
+npm run docs:dev      # 启动本地开发服务器（热重载）
+npm run docs:build    # 构建到 docs/.vitepress/dist/
+npm run docs:preview  # 本地预览生产构建结果
+npm run new <section> <slug>  # 创建新文章
+# 可用分区：ai | notes | projects
+# 示例：npm run new notes fastapi
 ```
 
-There are no lint or test commands — this is a static content site.
+本项目是静态内容站，没有 lint 或测试命令。
 
-## Deployment
+## 部署方式
 
-Push to `main` → GitHub Actions builds → deploys to GitHub Pages at `keaneai.top`. The workflow uses `fetch-depth: 0` so `lastUpdated` git timestamps work correctly.
+推送到 `main` → GitHub Actions 构建 → 部署到 GitHub Pages（keaneai.top）。工作流使用 `fetch-depth: 0` 以确保 `lastUpdated` 时间戳正常工作。
 
-**Critical sync rule:** The Admin Panel writes commits directly to GitHub via the REST API. Always `git pull --rebase origin main` before making local changes, to avoid overwriting remote Admin Panel edits. A `.git/hooks/pre-push` hook does this automatically before every push.
+**重要同步规则：** 博客管理后台（Admin Panel）通过 GitHub REST API 直接提交到远端，不经过本地 git 树。每次本地推送前必须先 `git pull --rebase origin main`，否则会覆盖后台的修改。`.git/hooks/pre-push` 钩子会在每次推送前自动完成这一步。
 
-## Architecture
+## 架构说明
 
-### Content Structure
+### 内容结构
 
-Three content sections, each auto-generating its sidebar via `vitepress-sidebar`:
-- `docs/ai/` — AI platform guides (Claude, OpenAI, Gemini, prompting)
-- `docs/notes/` — Technical cheat sheets (Python, Docker, Linux, Git, embedded)
-- `docs/projects/` — Project write-ups
+三个内容分区，均通过 `vitepress-sidebar` 自动生成侧边栏：
+- `docs/ai/` — AI 平台指南（Claude、OpenAI、Gemini、Prompt 技巧）
+- `docs/notes/` — 技术速查笔记（Python、Docker、Linux、Git、嵌入式）
+- `docs/projects/` — 项目实战记录
 
-Every content `.md` file should have this frontmatter:
+每个内容 `.md` 文件应包含以下 frontmatter：
 ```yaml
 ---
 title: 显示标题
 description: 文章摘要（供搜索结果和 RecentPosts 组件使用）
 date: YYYY-MM-DD
 tags: [Tag1, Tag2]
-order: 1          # lower = higher in sidebar
+order: 1          # 数字越小越靠前
 ---
 ```
 
-The sidebar order comes from `order` frontmatter (`frontmatterOrderDefaultValue: 99`). `index.md` files are excluded from sidebars and serve as section landing pages.
+侧边栏排序依据 `order` 字段（默认值 99）。`index.md` 被排除在侧边栏之外，作为各分区的首页。
 
-### Theme Extension (`docs/.vitepress/theme/`)
+### 主题扩展（`docs/.vitepress/theme/`）
 
-`index.ts` extends the default VitePress theme with three injected components via layout slots:
-- `nav-bar-content-after` → `ThemePicker.vue` — 5 color themes stored in `data-theme` on `<html>`; persisted in `localStorage`
-- `doc-before` → `ReadingTime.vue` — estimates reading time (chars ÷ 400), hidden on layout pages
-- `home-features-after` → `RecentPosts.vue` — renders the 6 most recent posts on the homepage only (`frontmatter.layout === 'home'`)
+`index.ts` 通过 VitePress 布局插槽注入三个自定义组件：
+- `nav-bar-content-after` → `ThemePicker.vue` — 5 套配色主题，以 `data-theme` 写入 `<html>`，持久化到 `localStorage`
+- `doc-before` → `ReadingTime.vue` — 预估阅读时间（字符数 ÷ 400），在 layout 页面上隐藏
+- `home-features-after` → `RecentPosts.vue` — 仅在首页（`frontmatter.layout === 'home'`）展示最近 6 篇文章
 
-`custom.css` drives the brand color system via CSS variables (`--vp-c-brand-*`), per-theme overrides via `[data-theme='green']` etc., and a scroll-driven reading progress bar (`animation-timeline: scroll(root)`) using `@supports` for progressive enhancement.
+`custom.css` 通过 CSS 变量（`--vp-c-brand-*`）驱动品牌色系，用 `[data-theme='green']` 等实现多主题覆盖，并通过 `@supports (animation-timeline: scroll())` 实现渐进增强的顶部阅读进度条。
 
-### Build-Time Data (`docs/data/posts.data.ts`)
+### 构建期数据（`docs/data/posts.data.ts`）
 
-`createContentLoader` scans `ai/*.md`, `notes/*.md`, `projects/*.md` at build time, filters to pages that have a `date` frontmatter field, sorts descending, and exports the top 6 as `PostData[]`. `RecentPosts.vue` imports this at runtime. Adding a new article won't appear in RecentPosts unless `date` is set in its frontmatter.
+`createContentLoader` 在构建时扫描 `ai/*.md`、`notes/*.md`、`projects/*.md`，筛选含 `date` 字段的页面，按日期降序排列后取前 6 条，导出为 `PostData[]`。`RecentPosts.vue` 在运行时导入该数据。新文章若未设置 `date` 字段，将不会出现在首页"最近更新"中。
 
-### Interactive Tools (`docs/tools/`)
+### 在线工具（`docs/tools/`）
 
-Each tool page is a `.md` file that imports and renders a Vue SFC from `docs/.vitepress/theme/tools/`:
+每个工具页面是一个 `.md` 文件，通过 `<script setup>` 引入并渲染 `docs/.vitepress/theme/tools/` 下的 Vue SFC：
 
-| Page | Component | Key APIs |
-|------|-----------|----------|
-| `qrcode.md` | `QrCode.vue` | `qrcode` npm package (Canvas + SVG output) |
+| 页面 | 组件 | 核心 API |
+|------|------|---------|
+| `qrcode.md` | `QrCode.vue` | `qrcode` npm 包（Canvas + SVG 输出） |
 | `hash.md` | `HashCalc.vue` | `crypto.subtle.digest` |
-| `base64.md` | `Base64Tool.vue` | `FileReader`, `btoa/atob`, MIME detection |
-| `json.md` | `JsonFormat.vue` | `JSON.parse/stringify`, key sorting |
-| `timestamp.md` | `TimestampTool.vue` | `Date`, auto-detect ms vs sec (`n > 1e12`) |
-| `prompt.md` | `PromptBuilder.vue` | `localStorage` for custom presets |
+| `base64.md` | `Base64Tool.vue` | `FileReader`、`btoa/atob`、MIME 类型检测 |
+| `json.md` | `JsonFormat.vue` | `JSON.parse/stringify`、键名排序 |
+| `timestamp.md` | `TimestampTool.vue` | `Date`、自动识别秒/毫秒（`n > 1e12`） |
+| `prompt.md` | `PromptBuilder.vue` | `localStorage` 存储自定义预设 |
 
-To add a new tool: create the Vue component in `theme/tools/`, create a `.md` page that imports it, add entries in `config.ts` under both `nav` (工具 dropdown) and the `/tools/` sidebar.
+新增工具的步骤：在 `theme/tools/` 创建 Vue 组件 → 在 `docs/tools/` 创建对应 `.md` 页面 → 在 `config.ts` 的"工具"下拉导航和 `/tools/` 侧边栏中各添加一条入口。
 
-The `/tools/` sidebar is **manually defined** in `config.ts` (unlike the auto-generated `ai/notes/projects` sidebars).
+`/tools/` 侧边栏在 `config.ts` 中**手动维护**，与 `ai/notes/projects` 的自动生成方式不同。
 
-### Admin Panel (`docs/public/admin/index.html`)
+### 博客管理后台（`docs/public/admin/index.html`）
 
-A standalone single-file HTML app (no build step) deployed as a static asset. It:
-1. Encrypts the GitHub Personal Access Token with AES-GCM + PBKDF2, stores in `localStorage`
-2. Uses the GitHub REST API (`/repos/{owner}/{repo}/contents/{path}`) to list, read, and write files
-3. Edits frontmatter fields (`title`, `order`, `description`, `tags`, `date`) via toolbar inputs and the `setFrontmatterField()` helper
-4. Commits changes directly to `main` with a SHA-based update (requires current file SHA to avoid conflicts)
+一个无构建步骤的单文件 HTML 应用，作为静态资源部署。工作流程：
+1. 用 AES-GCM + PBKDF2 加密 GitHub Personal Access Token，存入 `localStorage`
+2. 通过 GitHub REST API（`/repos/{owner}/{repo}/contents/{path}`）列举、读取、写入文件
+3. 工具栏输入框（`title`、`order`、`description`、`tags`、`date`）通过 `setFrontmatterField()` 函数修改 frontmatter
+4. 基于当前文件 SHA 直接提交到 `main`（需要 SHA 以避免冲突）
 
-Because the Admin Panel bypasses the local git tree entirely, local and remote can diverge. The pre-push hook handles this automatically.
+后台绕过本地 git 树直接操作远端，因此本地与远端可能出现分叉，pre-push 钩子会自动处理这一情况。
