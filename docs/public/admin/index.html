@@ -212,6 +212,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <input id="new-title" type="text" placeholder="例：DeepSeek 使用指南">
     <label>文件名（英文小写，不含 .md，留空自动生成）</label>
     <input id="new-slug" type="text" placeholder="例：deepseek（留空则自动生成）">
+    <div class="err" style="min-height:18px;margin-bottom:4px"></div>
     <div class="dialog-footer">
       <button class="btn-p" style="flex:1" onclick="createFile()">创建并编辑</button>
       <button class="btn-s" style="flex:1" onclick="closeDlg('new-dlg')">取消</button>
@@ -375,6 +376,7 @@ function api(path,method='GET',body){
 // ── File list ─────────────────────────────────────────────────────────
 async function loadList(){
   const el=document.getElementById('file-list')
+  el.innerHTML='<div style="padding:16px;color:var(--muted);font-size:13px">加载中…</div>'
   let html=''
 
   // 文章分区
@@ -494,6 +496,12 @@ function setFrontmatterField(content,key,value){
   if(idx>=0)lines[idx]=`${key}: ${value}`;else lines.push(`${key}: ${value}`)
   return`---\n${lines.join('\n')}\n---${content.slice(end+3)}`
 }
+function removeFrontmatterField(content,key){
+  if(!content.startsWith('---'))return content
+  const end=content.indexOf('---',3);if(end===-1)return content
+  const lines=content.slice(3,end).trim().split('\n').filter(l=>!l.startsWith(key+':'))
+  return`---\n${lines.join('\n')}\n---${content.slice(end+3)}`
+}
 
 // ── Download ──────────────────────────────────────────────────────────
 function downloadFile(){
@@ -520,13 +528,14 @@ async function saveFile(){
   if(orderInput.style.display!=='none'&&orderInput.value){
     content=setFrontmatterOrder(content,orderInput.value)
   }
-  // update description, tags, date
+  // update description, tags, date（空值时从 frontmatter 中删除该字段）
   const descVal=document.getElementById('desc-input').value.trim()
-  if(descVal) content=setFrontmatterField(content,'description',descVal)
+  content=descVal?setFrontmatterField(content,'description',descVal):removeFrontmatterField(content,'description')
   const tagsVal=document.getElementById('tags-input').value.trim()
   if(tagsVal){const arr=tagsVal.split(',').map(t=>t.trim()).filter(Boolean);content=setFrontmatterField(content,'tags','['+arr.join(', ')+']')}
+  else content=removeFrontmatterField(content,'tags')
   const dateVal=document.getElementById('date-input').value
-  if(dateVal) content=setFrontmatterField(content,'date',dateVal)
+  content=dateVal?setFrontmatterField(content,'date',dateVal):removeFrontmatterField(content,'date')
   document.getElementById('editor').value=content
 
   // ── 分区迁移判断 ──
@@ -591,6 +600,7 @@ async function deleteFile(){
   if(r.ok){
     const secKey=Object.keys(SECTIONS).find(k=>curPath.startsWith(SECTIONS[k].path+'/'))
     if(secKey) await removeFromSectionIndex(secKey,curPath.split('/').pop().replace(/\.md$/,''))
+    delTitleCache(curPath)
     curPath='';curSha=''
     document.getElementById('toolbar').style.display='none'
     document.getElementById('panes').style.display='none'
@@ -650,7 +660,10 @@ function openNewDlg(){
   document.getElementById('new-slug').value=''
   document.getElementById('new-dlg').classList.add('open')
 }
-function closeDlg(id){document.getElementById(id).classList.remove('open')}
+function closeDlg(id){
+  const el=document.getElementById(id);el.classList.remove('open')
+  const errEl=el.querySelector('.err');if(errEl)errEl.textContent=''
+}
 
 async function createFile(){
   const title=document.getElementById('new-title').value.trim()
@@ -663,8 +676,8 @@ async function createFile(){
   setStatus('创建中…','info')
   const r=await api(`contents/${path}`,'PUT',{
     message:`docs: create ${slug}.md`,content:btoa(unescape(encodeURIComponent(tpl))),branch:BRANCH})
-  closeDlg('new-dlg')
   if(r.ok){
+    closeDlg('new-dlg')
     const d=await r.json()
     await updateSectionIndex(section,slug,title)
     await loadList()
@@ -673,7 +686,9 @@ async function createFile(){
     setStatus(`✓ 已创建 ${slug}.md`,'ok')
   }else{
     const e=await r.json().catch(()=>({}))
-    setStatus('创建失败：'+(e.message||'文件可能已存在'),'err')
+    const msg='创建失败：'+(e.message||'文件可能已存在')
+    setStatus(msg,'err')
+    document.getElementById('new-dlg').querySelector('.err').textContent=msg
   }
 }
 
