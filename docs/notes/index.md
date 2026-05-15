@@ -22,4 +22,4 @@ title: index
 ## 参考资料
 
 - [中科蓝讯（Bluetrum）芯片数据库](./bluetrum_chip_db) — 蓝讯芯片选型参数速查
-- [cjson porting guide](./cjson_porting_guide)
+- [cjson porting guide](./cjson_porting_guide) - CJson源码移植手册
