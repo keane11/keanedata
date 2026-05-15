@@ -22,3 +22,4 @@ title: index
 
 - [提示词工程](./prompt) — 写好 Prompt 的方法论与常用模板
 - [HARNESS WorkFlow](./HARNESS_WorkFlow) - 围绕 AI Agent 构建约束机制、反馈回路、工作流控制和持续改进循环的系统工程实践。
+- [cjson porting guide](./cjson_porting_guide)
