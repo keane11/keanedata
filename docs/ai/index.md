@@ -1,3 +1,7 @@
+---
+title: index
+---
+
 # AI 平台概览
 
 收录各主流 AI 平台的配置教程、使用技巧和实践经验。
@@ -17,4 +21,4 @@
 ## 方法论
 
 - [提示词工程](./prompt) — 写好 Prompt 的方法论与常用模板
-- [HARNESS WorkFlow](./HARNESS_WorkFlow)
+- [HARNESS WorkFlow](./HARNESS_WorkFlow) - 围绕 AI Agent 构建约束机制、反馈回路、工作流控制和持续改进循环的系统工程实践。
