@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
 
-const sections = { ai: 'AI 平台', notes: '编程笔记', projects: '项目实战' }
+const sections = { ai: 'AI 平台', notes: '编程笔记', projects: '项目实战', productivity: '生产力工具' }
 const [, , section, slug] = process.argv
 
 if (!section || !slug || !sections[section]) {

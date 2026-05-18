@@ -13,9 +13,10 @@ const sidebarOptions = {
 }
 
 const sidebar = generateSidebar([
-  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'ai',       resolvePath: '/ai/' },
-  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'notes',    resolvePath: '/notes/' },
-  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'projects', resolvePath: '/projects/' },
+  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'ai',           resolvePath: '/ai/' },
+  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'notes',        resolvePath: '/notes/' },
+  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'projects',     resolvePath: '/projects/' },
+  { ...sidebarOptions, documentRootPath: 'docs', scanStartPath: 'productivity', resolvePath: '/productivity/' },
 ])
 
 export default defineConfig({
@@ -45,6 +46,7 @@ export default defineConfig({
       { text: 'AI 平台',  link: '/ai/' },
       { text: '编程笔记', link: '/notes/' },
       { text: '项目实战', link: '/projects/' },
+      { text: '生产力工具', link: '/productivity/' },
       {
         text: '工具',
         link: '/tools/',
