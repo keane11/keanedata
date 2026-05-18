@@ -54,6 +54,7 @@ export default defineConfig({
           { text: '🔲 QR 码生成器', link: '/tools/qrcode' },
           { text: '#  Hash 计算器', link: '/tools/hash' },
           { text: '✨ Prompt 构建器', link: '/tools/prompt' },
+          { text: '📖 网文 Prompt 生成器', link: '/tools/novel-prompt' },
           { text: '📄 Base64 编解码', link: '/tools/base64' },
           { text: '{}  JSON 格式化', link: '/tools/json' },
           { text: '⏱  时间戳转换', link: '/tools/timestamp' },
@@ -79,6 +80,7 @@ export default defineConfig({
           text: 'AI 辅助',
           items: [
             { text: 'Prompt 构建器', link: '/tools/prompt' },
+            { text: '网文 Prompt 生成器', link: '/tools/novel-prompt' },
           ],
         },
         {
