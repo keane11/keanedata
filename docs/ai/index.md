@@ -6,6 +6,10 @@ title: index
 
 收录各主流 AI 平台的配置教程、使用技巧和实践经验。
 
+## 新手入门
+
+- [前置准备：VPN · 接码 · 虚拟信用卡](./ai-account-prerequisites) — 注册所有海外 AI 账号前必须搞定的三件事
+
 ## 模型使用
 
 - [Claude](./claude) — Anthropic 出品，擅长长文本分析和代码；含 Claude Code CLI 深度指南
