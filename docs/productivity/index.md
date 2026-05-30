@@ -9,6 +9,8 @@ title: 生产力工具
 ## 云与基础设施
 
 - [ECS 云服务器搭建](./ecs-server) — 阿里云 ECS 购买、公网 IP 绑定、域名解析、Nginx 全流程
+- [KVM VPS 部署完整流程](./KVM-VPS-部署完整流程) — 从服务器选购、系统初始化到 3X-UI 多用户 VLESS+Reality 节点部署
+- [DeepSeek TUI / CodeWhale WSL 安装](./deepseek-tui-wsl) — Ubuntu 22.04 glibc 版本不兼容时的 Cargo 编译安装方案
 
 ## AI 内容创作
 
