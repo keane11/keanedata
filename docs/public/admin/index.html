@@ -165,6 +165,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
           <option value="ai">AI 平台</option>
           <option value="notes">编程笔记</option>
           <option value="projects">项目实战</option>
+          <option value="productivity">生产力工具</option>
         </select>
         <input id="title-input" type="text" class="toolbar-input"
           placeholder="博客显示标题"
@@ -207,6 +208,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <option value="ai">AI 平台</option>
       <option value="notes">编程笔记</option>
       <option value="projects">项目实战</option>
+      <option value="productivity">生产力工具</option>
     </select>
     <label>文章标题</label>
     <input id="new-title" type="text" placeholder="例：DeepSeek 使用指南">
@@ -229,6 +231,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <option value="ai">AI 平台</option>
       <option value="notes">编程笔记</option>
       <option value="projects">项目实战</option>
+      <option value="productivity">生产力工具</option>
     </select>
 
     <div class="upload-zone" id="drop-zone"
@@ -260,15 +263,17 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <script>
 const OWNER='keane11', REPO='keanedata', BRANCH='main'
 const SECTIONS={
-  ai:      {label:'AI 平台', path:'docs/ai'},
-  notes:   {label:'编程笔记',path:'docs/notes'},
-  projects:{label:'项目实战',path:'docs/projects'},
+  ai:           {label:'AI 平台',   path:'docs/ai'},
+  notes:        {label:'编程笔记',  path:'docs/notes'},
+  projects:     {label:'项目实战',  path:'docs/projects'},
+  productivity: {label:'生产力工具',path:'docs/productivity'},
 }
 const PAGES={
-  '首页':     'docs/index.md',
-  'AI 概览':  'docs/ai/index.md',
-  '笔记概览': 'docs/notes/index.md',
-  '项目概览': 'docs/projects/index.md',
+  '首页':       'docs/index.md',
+  'AI 概览':    'docs/ai/index.md',
+  '笔记概览':   'docs/notes/index.md',
+  '项目概览':   'docs/projects/index.md',
+  '生产力概览': 'docs/productivity/index.md',
 }
 const STORE_KEY='blog_admin_enc'
 const TITLE_CACHE_KEY='blog_admin_titles'
@@ -771,7 +776,7 @@ function parseMD(md){
     .replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>').replace(/^---$/gm,'<hr>')
     .replace(/^\|(.+)\|$/gm,r=>'<tr>'+r.slice(1,-1).split('|').map(c=>`<td>${c.trim()}</td>`).join('')+'</tr>')
     .replace(/(<tr>.*?<\/tr>\n?)+/gs,s=>`<table>${s}</table>`)
-    .replace(/<tr><td>[-:| ]+<\/td><\/tr>/g,'')
+    .replace(/<tr>(<td>[-:| ]+<\/td>)+<\/tr>/g,'')
     .replace(/^[-*] (.+)$/gm,'<li>$1</li>').replace(/(<li>.*?<\/li>\n?)+/gs,s=>`<ul>${s}</ul>`)
     .replace(/\n\n(?!<)/g,'</p><p>')
   return`<p>${h}</p>`

@@ -10,7 +10,7 @@ interface PostData {
 declare const data: PostData[]
 export { data }
 
-export default createContentLoader(['ai/*.md', 'notes/*.md', 'projects/*.md'], {
+export default createContentLoader(['ai/*.md', 'notes/*.md', 'projects/*.md', 'productivity/*.md'], {
   transform(raw) {
     return raw
       .filter(p => p.frontmatter.date && !p.url.endsWith('/index') && p.frontmatter.layout !== 'home')
