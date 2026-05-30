@@ -1,5 +1,32 @@
 import { defineConfig } from 'vitepress'
 import { generateSidebar } from 'vitepress-sidebar'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { resolve, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// 构建期扫描所有 .md 文件，收集 hidden: true 的文章路径，加入 srcExclude
+// 这样 VitePress 根本不会生成对应 HTML，直接访问 URL 也会 404
+const docsDir = fileURLToPath(new URL('..', import.meta.url))
+function collectHiddenFiles(): string[] {
+  const result: string[] = []
+  function scan(dir: string) {
+    for (const name of readdirSync(dir)) {
+      const full = resolve(dir, name)
+      if (statSync(full).isDirectory()) {
+        if (name !== '.vitepress' && name !== 'public' && !name.startsWith('.')) scan(full)
+      } else if (name.endsWith('.md')) {
+        const text = readFileSync(full, 'utf-8')
+        if (text.startsWith('---')) {
+          const close = text.indexOf('\n---', 3)
+          if (close > 0 && /^hidden:\s*true\b/m.test(text.slice(3, close)))
+            result.push(relative(docsDir, full))
+        }
+      }
+    }
+  }
+  scan(docsDir)
+  return result
+}
 
 const sidebarOptions = {
   useTitleFromFrontmatter: true,
@@ -26,6 +53,7 @@ export default defineConfig({
   lang: 'zh-CN',
   ignoreDeadLinks: true,
   lastUpdated: true,
+  srcExclude: collectHiddenFiles(),
 
   sitemap: {
     hostname: 'https://www.keaneai.top',
