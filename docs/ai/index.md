@@ -6,9 +6,15 @@ title: index
 
 收录各主流 AI 平台的配置教程、使用技巧和实践经验。
 
-## 新手入门
+## 新手入门（按顺序读）
 
-- [前置准备：VPN · 接码 · 虚拟信用卡](./ai-account-prerequisites) — 注册所有海外 AI 账号前必须搞定的三件事
+- [前置准备：VPN · 接码 · 虚拟信用卡](./ai-account-prerequisites) — 注册前必须搞定的三件事，含 iOS 美区/土区、Android 订阅方案
+- [Google 账号注册全流程](./google-account-register) — Gmail 是一切的基础，手机 App 注册绕过验证
+- [ChatGPT / Claude / Gemini 注册与订阅](./chatgpt-claude-gemini-register) — 三平台完整注册流程 + 所有付费通道
+
+## 工具选型
+
+- [AI 编程工具横评：Cursor vs Copilot vs Claude Code](./ai-coding-tools-compare) — 个人开发者视角，含国内外平台对比与推荐方案
 
 ## 模型使用
 
