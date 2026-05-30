@@ -507,41 +507,217 @@ https://你的VPS_IP:2096/sub/用户的subId
 
 > ⚠️ 订阅端口（2096）和面板端口（54321）是两个独立端口，配置时注意不要混淆。
 
-### 8.12 订阅 / 连接常见问题
+### 8.12 订阅 / 连接故障排查（完整流程）
 
-#### 问题1：Shadowrocket 拉取订阅超时（HTTP 404）
+#### 四类问题速查
 
-**原因**：订阅服务未启用。按 8.11 节在面板设置里开启，并放行 2096 端口。
+| # | 现象 | 根本原因 | 影响 |
+|---|------|---------|------|
+| 1 | 订阅 URL 返回 **404** | 订阅服务未启用（`settings` 表缺少 `subEnable` 等字段） | 无法拉取订阅 |
+| 2 | 3X-UI 启动报 `bind: address already in use` | `subPort` 与面板端口相同（如都设 54321） | 服务无法启动 |
+| 3 | 能拉取订阅但**连接超时**（链接含 `mlkem768x25519plus`） | xray-core 26.5.9+ 默认启用 ML-KEM 后量子加密，Shadowrocket 不支持 | 节点连接超时 |
+| 4 | 能拉取订阅但**连接超时**（flow 为空） | VLESS+REALITY 必须有 `flow=xtls-rprx-vision`，客户端 flow 字段为空 | 节点连接超时 |
 
-#### 问题2：能拉取订阅，但连接一直超时
+---
 
-多为以下两种原因：
-
-**原因 A：ML-KEM 后量子加密兼容性问题**
-
-xray-core 26.5.9+ 默认启用了 `decryption=mlkem768x25519plus`，Shadowrocket 等客户端不支持。
-
-表现：订阅链接解码后包含 `encryption=mlkem768x25519plus...`。
-
-**修复**：创建入站时，协议标签只选 **X25519**，**不要点 ML-KEM-768**。已创建的入站需编辑 → 协议页 → 取消 ML-KEM → 保存。
-
-**原因 B：缺少 flow 参数**
-
-VLESS+REALITY 必须设置 `flow=xtls-rprx-vision`，检查客户端列表中该 Client 的 Flow 字段是否为空。
-
-**修复**：编辑 Client → Flow 字段填 `xtls-rprx-vision` → 保存 → 重新分发链接。
-
-#### 验证订阅链接正确性
+#### 第一步：确认服务与端口状态
 
 ```bash
-curl -sk "https://你的IP:2096/sub/你的subId" | base64 -d
+systemctl status x-ui           # x-ui 和 xray 子进程应均为 active
+ss -tlnp | grep -E '443|2096'   # 确认两个端口都在监听
+ufw status                       # 确认 443/2096/54321 均已放行
 ```
 
-解码后的链接应包含：
+#### 第二步：检查数据库（订阅配置）
+
+数据库路径：`/etc/x-ui/x-ui.db`
+
+关键表结构：
+
+| 表名 | 用途 |
+|------|------|
+| `inbounds` | 入站配置（端口、协议、stream_settings） |
+| `settings` | 系统设置（webPort、subPort、证书路径等） |
+| `clients` | 客户端（UUID、flow、subId） |
+| `client_inbounds` | 客户端与入站的关联 |
+
+```bash
+# 查看订阅相关配置是否存在
+sqlite3 /etc/x-ui/x-ui.db "SELECT key, value FROM settings WHERE key LIKE 'sub%';"
+```
+
+正常应有 `subEnable=true`、`subPort=2096`、`subPath=/sub/` 等记录。**如果没有输出，说明订阅服务从未配置过。**
+
+#### 第三步：验证订阅链接内容
+
+```bash
+curl -sk "https://你的VPS_IP:2096/sub/你的subId" | base64 -d
+```
+
+正确的链接应包含：
 - ✅ `flow=xtls-rprx-vision`
 - ✅ `security=reality`
 - ✅ `pbk=...`（publicKey）
-- ❌ 不应有 `encryption=mlkem768x25519plus`
+- ❌ **不应有** `encryption=mlkem768x25519plus`（有则说明存在 ML-KEM 问题）
+
+---
+
+#### 修复方法
+
+**优先用 GUI 修复**（面板设置 → 订阅设置；编辑 Client → Flow/协议），重启后若不生效再用下面的脚本。
+
+---
+
+**修复1：订阅服务未启用（Python 脚本）**
+
+面板 GUI 方法见 §8.11。如果 GUI 保存后仍然 404，用 Python 直接写入数据库：
+
+```python
+import sqlite3
+
+conn = sqlite3.connect('/etc/x-ui/x-ui.db')
+c = conn.cursor()
+
+settings = {
+    'subEnable':  'true',
+    'subPort':    '2096',       # 独立端口，不要与面板端口相同
+    'subListen':  '0.0.0.0',
+    'subPath':    '/sub/',
+    'subDomain':  '',
+}
+
+for key, value in settings.items():
+    c.execute('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', (key, value))
+
+conn.commit()
+conn.close()
+print('订阅配置已写入，执行 systemctl restart x-ui 生效')
+```
+
+> ⚠️ **端口冲突**：`subPort` 不能和 `webPort`（面板端口）相同，否则启动时报 `bind: address already in use`。
+
+---
+
+**修复2：移除 ML-KEM 后量子加密（Python 脚本）**
+
+面板 GUI 方法：编辑入站 → 协议页 → 取消 ML-KEM-768 → 只保留 X25519。
+
+如果 GUI 修复后重启仍然含有 mlkem 字段，用脚本直接操作：
+
+```python
+import sqlite3, json
+
+conn = sqlite3.connect('/etc/x-ui/x-ui.db')
+c = conn.cursor()
+
+c.execute('SELECT id, settings FROM inbounds WHERE port = 443')
+row = c.fetchone()
+s = json.loads(row[1])
+
+s['decryption'] = 'none'
+s.pop('encryption', None)
+s.pop('testseed', None)
+
+c.execute('UPDATE inbounds SET settings = ? WHERE id = ?', (json.dumps(s, indent=2), row[0]))
+conn.commit()
+conn.close()
+print('ML-KEM 已移除，执行 systemctl restart x-ui 生效')
+```
+
+---
+
+**修复3：补全 flow 参数（Python 脚本）**
+
+面板 GUI 方法：客户端列表 → 编辑 → Flow 填 `xtls-rprx-vision`。
+
+如果 GUI 修复后链接中仍无 flow，用脚本同时更新两张表：
+
+```python
+import sqlite3, json
+
+conn = sqlite3.connect('/etc/x-ui/x-ui.db')
+c = conn.cursor()
+
+# 更新 clients 表（所有 flow 为空的用户）
+c.execute("UPDATE clients SET flow = 'xtls-rprx-vision' WHERE flow IS NULL OR flow = ''")
+
+# 同步更新 inbounds.settings JSON 里的 clients 字段
+c.execute('SELECT id, settings FROM inbounds WHERE port = 443')
+row = c.fetchone()
+sets = json.loads(row[1])
+for client in sets.get('clients', []):
+    client['flow'] = 'xtls-rprx-vision'
+c.execute('UPDATE inbounds SET settings = ? WHERE id = ?', (json.dumps(sets, indent=2), row[0]))
+
+conn.commit()
+conn.close()
+print('flow 参数已更新，执行 systemctl restart x-ui 生效')
+```
+
+---
+
+**每次修改数据库后必须重启：**
+
+```bash
+systemctl restart x-ui
+```
+
+---
+
+#### 完整验证流程
+
+**验证1：订阅链接解码**
+
+```bash
+curl -sk "https://你的VPS_IP:2096/sub/你的subId" | base64 -d
+```
+
+**验证2：REALITY 透传测试**（验证伪装是否正常）
+
+```bash
+timeout 3 openssl s_client -connect 你的VPS_IP:443 -servername www.microsoft.com
+```
+
+成功时能看到微软的证书链（`CN=www.microsoft.com`），说明 REALITY 工作正常。
+
+**验证3：确认 xray 运行配置**
+
+```bash
+python3 -c "
+import json
+with open('/usr/local/x-ui/bin/config.json') as f:
+    cfg = json.load(f)
+for inbound in cfg['inbounds']:
+    if inbound.get('port') == 443:
+        s = inbound.get('settings', {})
+        print('decryption:', s.get('decryption'))
+        for c in s.get('clients', []):
+            print('flow:', c.get('flow'))
+"
+```
+
+期望输出：
+```
+decryption: none
+flow: xtls-rprx-vision
+```
+
+**验证4：端口监听**
+
+```bash
+ss -tlnp | grep -E '(443|2096)'
+# 期望：443 和 2096 都有 LISTEN
+```
+
+---
+
+#### 如果仍然不行
+
+1. **Shadowrocket 删除旧订阅重新添加** — 旧缓存可能保留了 ML-KEM 配置
+2. **确认 Shadowrocket 版本 ≥ 2.2.16** — 旧版不支持 VLESS+REALITY
+3. **检查是添加订阅超时还是连接节点超时** — 前者是网络/端口问题，后者是配置问题
+4. **尝试换一个 shortId** — 编辑入站 → 安全页 → 重新生成 Short IDs → 重新分发链接
+5. **检查本地网络能否直连 VPS:443** — `telnet 你的VPS_IP 443` 或 `nc -zv 你的VPS_IP 443`
 
 ### 8.13 清理不必要的服务
 
