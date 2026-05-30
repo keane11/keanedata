@@ -180,13 +180,33 @@ USDT 入账后 → 申请虚拟 Visa/Mastercard → 把 USDT 换成美元充值�
 
 #### 第一步：注册美区 Apple ID
 
-> ⚠️ **必须注册新账号**，不要把现有国区账号转区（会影响已购应用和 iCloud）
+> ⚠️ **必须用新邮箱注册全新账号**，不要把国区账号转美区（会影响已购 App 和 iCloud 数据）
 
-1. 打开浏览器访问 [appleid.apple.com](https://appleid.apple.com)，点击"创建 Apple ID"
-2. 填写信息时，**国家/地区选"美国"**
-3. 邮箱用 Gmail 或 Outlook（不要用 QQ/163）
-4. 手机号可填国内 +86 号码，用于接收验证码
-5. 地址信息：随意填一个免税州（俄勒冈 / 蒙大拿），可用 [fakena.me](https://www.fakena.me) 生成
+**注册不需要 VPN，直接用国内网络操作即可。**
+
+1. 打开浏览器（建议无痕模式），访问 [appleid.apple.com](https://appleid.apple.com) → **"创建你的 Apple ID"**
+
+2. 填写基本信息：
+
+   | 字段 | 填写要点 |
+   |------|---------|
+   | 名字 / 姓氏 | 英文，随意填 |
+   | **国家 / 地区** | **必须选「美国」** |
+   | 生日 | 年龄须 **≥ 18 岁** |
+   | 电子邮件 | 用 Gmail 或 Outlook，**不要用 QQ / 163** |
+   | 密码 | 8 位以上，含大小写+数字 |
+   | 手机号 | **可以用 +86 国内号码** |
+
+3. 验证邮箱（收 6 位码）→ 验证手机号（收短信码）
+
+4. **账单地址（关键）**：
+   - 付款方式选 **"None（无）"**
+   - 地址选免税州：**俄勒冈（Oregon）** 或 **蒙大拿（Montana）**，可用 [fakena.me](https://www.fakena.me) 一键生成
+   - 电话填 fakena.me 生成的当地号码即可
+
+5. 点击继续，账号创建完成
+
+> ✅ **登录 App Store 只在「媒体与购买项目」里登录，不要在 iPhone 「设置→Apple ID」里换账号**，否则 iCloud 会切换，影响已有数据。
 
 #### 第二步：购买美区 App Store 礼品卡
 
@@ -197,19 +217,22 @@ USDT 入账后 → 申请虚拟 Visa/Mastercard → 把 USDT 换成美元充值�
 | **Pockyt**（推荐） | 官方授权渠道，即时发卡 | [shop.pockyt.io](https://shop.pockyt.io/pc/goodsDetail/vc1aYhc/App%20Store%20&%20iTunes%20USA/all) |
 | **bewild.ai** | 第三方代充，更省心，直接帮你完成订阅 | [bewild.ai/subscribe](https://bewild.ai/subscribe) |
 
-> 💡 **嫌麻烦？选 bewild.ai**：不用自己操作礼品卡兑换和订阅流程，付人民币直接搞定，适合不想折腾的人。
+> 💡 **嫌麻烦？选 bewild.ai**：不用自己操作礼品卡兑换和订阅流程，付人民币直接搞定。
 >
-> 自己买卡面值建议 **$25**，够订阅 1 个月 Plus（$20）还剩余额。
+> 自己买卡建议面值 **$25**（订阅 $20 后还有余额备用）。
 
-#### 第三步：兑换礼品卡
+#### 第三步：兑换礼品卡 + 登录 App Store
 
-在 iPhone 上切换到美区 Apple ID → 打开 App Store → 点右上角头像 → "兑换礼品卡或代码" → 输入卡码。
+1. iPhone 打开 `App Store` → 右上角头像
+2. 滑到底部 → **「退出登录」**（退出国区账号）
+3. 重新登录美区 Apple ID
+4. 头像 → **「兑换礼品卡或代码」** → 输入卡码，余额到账
 
-#### 第四步：下载 App 订阅
+#### 第四步：下载 App 并订阅
 
-App Store 搜索并下载 ChatGPT 或 Claude → 在 App 内点升级 → 选择订阅方案 → 用 Apple ID 余额支付。
+在美区 App Store 搜索 ChatGPT 或 Claude → 安装 → App 内点升级 → 用 Apple ID 余额支付。
 
-> ⚠️ **Claude 订阅特别注意**：Claude 账号的注册邮箱必须与 App Store 登录的美区 Apple ID 邮箱**完全一致**，否则订阅会失败或被封。
+> ⚠️ **Claude 订阅关键**：Claude 账号的注册邮箱必须与美区 Apple ID 邮箱**完全一致**，否则订阅失败或被封。
 
 **价格参考（美区）**：ChatGPT Plus $20/月，Claude Pro $20/月
 
@@ -217,30 +240,73 @@ App Store 搜索并下载 ChatGPT 或 Claude → 在 App 内点升级 → 选择
 
 ### 方案 B：iOS 土区 Apple ID + 礼品卡（便宜约 45%）
 
-**适合**：追求低价，可以接受稍麻烦的操作
+**适合**：追求低价，愿意多操作几步
 
-土耳其区 ChatGPT Plus 约 ₺500（约 **¥100/月**），比美区的 $20（约 ¥145）便宜近一半。
+土耳其区 ChatGPT Plus 约 ₺500（约 **¥100/月**），比美区 $20（约 ¥145）便宜将近一半。
 
-#### 注册土区 Apple ID
+**推荐方式：先注册国区账号，再通过专用页面转区到土耳其**（比直接注册土区更稳定）。
 
-与美区注册流程相同，只是：
-- **国家/地区选"土耳其"**
-- 地址填土耳其地址（伊斯坦布尔），可网上搜一个
+---
 
-#### 购买土耳其区礼品卡
+#### 第一阶段：注册中国大陆 Apple ID
 
-以下渠道均支持**支付宝付款**：
+1. 访问 [appleid.apple.com](https://appleid.apple.com) → 创建 Apple ID
+2. 国家/地区选**中国大陆**，用 Gmail/Outlook 邮箱注册
+3. 手机号填 +86 国内号码，完成邮箱 + 手机验证
+4. 账号注册完成（此时是国区账号）
 
-| 渠道 | 说明 | 链接 |
-|------|------|------|
-| **MTCGame**（推荐） | 专业礼品卡平台，即时发卡 | [mtcgame.com/apple-store/itunes-hediye-karti](https://www.mtcgame.com/apple-store/itunes-hediye-karti) |
-| **bewild.ai** | 第三方代充，省去自己操作的麻烦 | [bewild.ai/subscribe](https://bewild.ai/subscribe) |
+---
 
-#### 切换 App Store 到土区
+#### 第二阶段：网页端转区到土耳其
 
-手机端：`App Store` → 头像 → 滑到底部 → 点击国家/地区 → 切换到土耳其 → 用土区 Apple ID 登录。
+> ⚠️ **此阶段必须开 VPN，且必须是全局模式**（不是分流/规则模式）。节点选美国或欧洲，不要用土耳其节点。
 
-> ⚠️ **重要**：整个操作过程必须开 VPN，且要选**非中国节点**（用美国或欧洲节点，不要用土耳其节点，否则 App 无法正常使用）
+1. 开启 VPN 全局模式，确认 IP 为非中国
+2. 浏览器访问土耳其专用管理页面：**[account.apple.com/tr/](https://account.apple.com/tr/)**
+3. 用刚注册的 Apple ID 登录
+4. 进入 **「个人信息」** → 找到「国家/地区」→ 点 **「更改」**
+5. 填写以下信息：
+
+   | 字段 | 填写要点 |
+   |------|---------|
+   | 付款方式 | **选 None（无）**，不绑信用卡 |
+   | 街道地址 | 填伊斯坦布尔地址（用 [1ktools.com](https://www.1ktools.com) 生成） |
+   | 城市 | **Istanbul** |
+   | 省/州 | İstanbul |
+   | 邮编 | 34000（或生成器提供的真实邮编） |
+   | 电话 | 保留原有 **+86 国内手机号**即可 |
+
+6. 点击保存，页面显示国家变为 **Türkiye（土耳其）** → 转区成功
+
+> 💡 如果「付款方式」里没有 None 选项，说明 VPN 没有全局代理，代理软件切到「全局模式」后刷新重试。
+
+---
+
+#### 第三阶段：手机端切换 App Store 到土区
+
+1. iPhone 打开 `App Store` → 头像 → 滑到底部 → **退出登录**
+2. 重新登录刚转区的土区 Apple ID
+3. App Store 首页应变为土耳其界面（显示土耳其语 / TL 价格）
+4. **立即下载一个免费 App**（如 YouTube），把店面锁定在土区
+
+> ⚠️ 使用土区账号浏览和下载 App 时，**VPN 节点选非土耳其的节点**（美国 / 欧洲），否则部分 App 可能无法正常使用。
+
+---
+
+#### 第四阶段：购买土区礼品卡并订阅
+
+购买土区礼品卡（支持支付宝）：
+
+| 渠道 | 链接 |
+|------|------|
+| **MTCGame**（推荐） | [mtcgame.com/apple-store/itunes-hediye-karti](https://www.mtcgame.com/apple-store/itunes-hediye-karti) |
+| **bewild.ai**（代充省心）| [bewild.ai/subscribe](https://bewild.ai/subscribe) |
+
+兑换礼品卡：App Store → 头像 → 兑换礼品卡或代码 → 输入卡码
+
+订阅：打开 ChatGPT App → 升级 Plus → 用 Apple ID 余额支付
+
+> ⚠️ **新账号建议等 24–48 小时再订阅**，刚转区立即大额消费容易触发风控。
 
 ---
 
