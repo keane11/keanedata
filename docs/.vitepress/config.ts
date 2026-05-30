@@ -139,9 +139,76 @@ export default defineConfig({
           ],
         },
       ],
+      '/notes/': [
+        {
+          text: '🐍 通用开发',
+          collapsed: false,
+          items: [
+            { text: 'Python 笔记', link: '/notes/python' },
+            { text: 'Git 笔记', link: '/notes/git' },
+            { text: 'Docker 笔记', link: '/notes/docker' },
+            { text: 'Linux 笔记', link: '/notes/linux' },
+          ],
+        },
+        {
+          text: '🔧 嵌入式开发',
+          collapsed: false,
+          items: [
+            { text: 'C 语言嵌入式开发笔记', link: '/notes/c_embedded' },
+            { text: 'FreeRTOS 开发笔记', link: '/notes/freertos' },
+            { text: 'RISC-V 嵌入式开发笔记', link: '/notes/riscv' },
+            { text: 'cJSON 移植指南', link: '/notes/cjson_porting_guide' },
+            { text: '中科蓝讯芯片数据库', link: '/notes/bluetrum_chip_db' },
+          ],
+        },
+      ],
+      '/projects/': [
+        {
+          text: '🌐 博客与工具',
+          collapsed: false,
+          items: [
+            { text: '博客搭建方案', link: '/projects/blog_plan' },
+            { text: 'QR 共享文件夹设计方案', link: '/projects/qr_file_design' },
+          ],
+        },
+        {
+          text: '🔩 嵌入式项目',
+          collapsed: false,
+          items: [
+            { text: 'BSP I2C Slave 移植手册', link: '/projects/bsp_i2c_slave_porting_guide' },
+          ],
+        },
+      ],
+      '/productivity/': [
+        {
+          text: '🖥️ 云与服务器',
+          collapsed: false,
+          items: [
+            { text: 'ECS 云服务器搭建', link: '/productivity/ecs-server' },
+            { text: 'KVM VPS 部署指南（含 3X-UI）', link: '/productivity/KVM-VPS-部署完整流程' },
+          ],
+        },
+        {
+          text: '✍️ AI 内容创作',
+          collapsed: false,
+          items: [
+            { text: 'AI 写中文网文', link: '/productivity/ai-novel' },
+            { text: 'AI 短剧 / 视频生成', link: '/productivity/ai-video' },
+          ],
+        },
+        {
+          text: '💰 变现与副业',
+          collapsed: false,
+          items: [
+            { text: '抖音切片上架橱窗', link: '/productivity/douyin-showcase' },
+            { text: '副业 & 自动化工具推荐', link: '/productivity/tools-automation' },
+          ],
+        },
+      ],
       '/tools/': [
         {
-          text: '开发工具',
+          text: '🔨 开发工具',
+          collapsed: false,
           items: [
             { text: 'QR 码生成器', link: '/tools/qrcode' },
             { text: 'Hash 计算器', link: '/tools/hash' },
@@ -151,14 +218,16 @@ export default defineConfig({
           ],
         },
         {
-          text: 'AI 辅助',
+          text: '🤖 AI 辅助',
+          collapsed: false,
           items: [
             { text: 'Prompt 构建器', link: '/tools/prompt' },
             { text: '网文 Prompt 生成器', link: '/tools/novel-prompt' },
           ],
         },
         {
-          text: '服务',
+          text: '📦 服务',
+          collapsed: false,
           items: [
             { text: '文件共享', link: '/tools/share' },
           ],
