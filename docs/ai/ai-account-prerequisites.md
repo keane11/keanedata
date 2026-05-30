@@ -190,9 +190,16 @@ USDT 入账后 → 申请虚拟 Visa/Mastercard → 把 USDT 换成美元充值�
 
 #### 第二步：购买美区 App Store 礼品卡
 
-通过支付宝购买（国内合法渠道）：
-- 打开支付宝 → 搜索 "**PockyShop**" 或 "**惠出境**"
-- 购买对应面值的美区 App Store 礼品卡（建议买 $25，够订阅 1 个月 Plus）
+以下渠道均支持**支付宝付款**：
+
+| 渠道 | 说明 | 链接 |
+|------|------|------|
+| **Pockyt**（推荐） | 官方授权渠道，即时发卡 | [shop.pockyt.io](https://shop.pockyt.io/pc/goodsDetail/vc1aYhc/App%20Store%20&%20iTunes%20USA/all) |
+| **bewild.ai** | 第三方代充，更省心，直接帮你完成订阅 | [bewild.ai/subscribe](https://bewild.ai/subscribe) |
+
+> 💡 **嫌麻烦？选 bewild.ai**：不用自己操作礼品卡兑换和订阅流程，付人民币直接搞定，适合不想折腾的人。
+>
+> 自己买卡面值建议 **$25**，够订阅 1 个月 Plus（$20）还剩余额。
 
 #### 第三步：兑换礼品卡
 
@@ -222,9 +229,12 @@ App Store 搜索并下载 ChatGPT 或 Claude → 在 App 内点升级 → 选择
 
 #### 购买土耳其区礼品卡
 
-土耳其区官方不卖礼品卡，需要从第三方购买：
-- 淘宝搜"土耳其 App Store 礼品卡"
-- 或在 [SEAGM](https://www.seagm.com)、[Eneba](https://www.eneba.com) 购买
+以下渠道均支持**支付宝付款**：
+
+| 渠道 | 说明 | 链接 |
+|------|------|------|
+| **MTCGame**（推荐） | 专业礼品卡平台，即时发卡 | [mtcgame.com/apple-store/itunes-hediye-karti](https://www.mtcgame.com/apple-store/itunes-hediye-karti) |
+| **bewild.ai** | 第三方代充，省去自己操作的麻烦 | [bewild.ai/subscribe](https://bewild.ai/subscribe) |
 
 #### 切换 App Store 到土区
 
@@ -249,7 +259,7 @@ App Store 搜索并下载 ChatGPT 或 Claude → 在 App 内点升级 → 选择
 2. 打开 App → 点升级订阅
 3. 支付方式：
    - **绑定 Dupay / OneKey 虚拟卡**（推荐，走 Google Pay）
-   - 或通过支付宝购买 **Google Play 礼品卡**（支付宝搜"PockyShop"有售）
+   - 或通过 [Pockyt](https://shop.pockyt.io) 购买 **Google Play 礼品卡**（支持支付宝）
 
 > Google Play 也支持切换区域享受低价，日本区和土耳其区价格更低，操作与 iOS 土区类似。
 

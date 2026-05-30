@@ -59,14 +59,16 @@ tags: [ChatGPT, Claude, Gemini, 注册, 订阅, OpenAI, Anthropic]
 
 **方式一：iOS 美区礼品卡（最简单）**
 
-1. 注册美区 Apple ID（详见[前置准备](./ai-account-prerequisites#方案-a ios-美区-apple-id--礼品卡稳定首选)）
-2. 支付宝搜 "PockyShop" 购买美区礼品卡 $25
+1. 注册美区 Apple ID（详见[前置准备](./ai-account-prerequisites#方案-a-ios-美区-apple-id--礼品卡稳定首选)）
+2. 用支付宝在 [Pockyt](https://shop.pockyt.io/pc/goodsDetail/vc1aYhc/App%20Store%20&%20iTunes%20USA/all) 购买美区礼品卡 $25
 3. iPhone 下载 ChatGPT App → 内购订阅 → 用 Apple ID 余额支付
+
+> 嫌麻烦可以直接用 [bewild.ai](https://bewild.ai/subscribe) 代充，支付宝付人民币，省去礼品卡兑换步骤。
 
 **方式二：iOS 土区礼品卡（便宜约 45%）**
 
 1. 注册土区 Apple ID
-2. 购买土耳其区礼品卡（淘宝 / SEAGM）
+2. 在 [MTCGame](https://www.mtcgame.com/apple-store/itunes-hediye-karti) 购买土耳其区礼品卡（支持支付宝）
 3. iPhone 切换土区 App Store → 下载 ChatGPT → 订阅
 
 > 土区 ChatGPT Plus 约 ₺500（≈¥100/月）
@@ -130,8 +132,10 @@ Claude 的风控延伸到订阅环节——用什么方式订阅，比其他平�
 1. 注册一个**与 Claude 账号同邮箱**的美区 Apple ID
    - 例：Claude 账号是 `abc@gmail.com`，Apple ID 也必须是 `abc@gmail.com`
 2. iPhone 切换到这个美区 Apple ID
-3. 支付宝购买美区礼品卡 $25
+3. 在 [Pockyt](https://shop.pockyt.io/pc/goodsDetail/vc1aYhc/App%20Store%20&%20iTunes%20USA/all) 购买美区礼品卡 $25（支付宝付款）
 4. 下载 Claude App → 内购订阅 Pro
+
+> 或直接用 [bewild.ai](https://bewild.ai/subscribe) 代充，更省心。
 
 > 这是目前成功率最高的方式，风控最少。
 
