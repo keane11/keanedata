@@ -176,6 +176,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
         <input id="desc-input" type="text" class="toolbar-input" placeholder="文章简介（description，≤120字）" style="flex:3;min-width:180px">
         <input id="tags-input" type="text" class="toolbar-input" placeholder="标签（逗号分隔，如：AI, Python）" style="flex:2;min-width:120px">
         <input id="date-input" type="date" class="toolbar-input" style="width:140px;flex:0">
+        <button class="btn-s btn-sm" id="hidden-btn" onclick="toggleHidden()" title="切换文章可见性（隐藏后访客看不到，后台仍可编辑）" style="display:none;white-space:nowrap">👁 显示中</button>
         <input id="commit-msg" type="text" class="toolbar-input" placeholder="提交说明（留空自动生成）">
         <button class="btn-p btn-sm" id="save-btn" onclick="saveFile()">保存发布</button>
         <button class="btn-s btn-sm" id="dl-btn" onclick="downloadFile()">下载 MD</button>
@@ -279,6 +280,7 @@ const STORE_KEY='blog_admin_enc'
 const TITLE_CACHE_KEY='blog_admin_titles'
 let token='', curPath='', curSha='', uploadContent=''
 const titleCache={}   // path → frontmatter title，用于侧边栏刷新后保留标题
+const hiddenCache={}  // path → boolean，记录已打开文章的隐藏状态
 // 从 sessionStorage 恢复上次会话的标题缓存（刷新页面内仍有效）
 try{Object.assign(titleCache,JSON.parse(sessionStorage.getItem(TITLE_CACHE_KEY)||'{}'))}catch{}
 function setTitleCache(path,title){
@@ -414,6 +416,8 @@ async function loadList(){
   }
 
   el.innerHTML=html
+  // 恢复已知的隐藏状态图标
+  Object.entries(hiddenCache).forEach(([p,h])=>{if(h)markHiddenInSidebar(p,true)})
 }
 
 // ── Open file ─────────────────────────────────────────────────────────
@@ -471,6 +475,15 @@ function loadEditor(path,sha,content,showOrder){
   const rawTags=fm.tags||'';document.getElementById('tags-input').value=rawTags.replace(/^\[|\]$/g,'')
   document.getElementById('date-input').value=fm.date||''
   document.getElementById('del-btn').style.display=showOrder?'':'none'
+  // hidden 按钮（仅文章显示）
+  const hiddenBtn=document.getElementById('hidden-btn')
+  hiddenBtn.style.display=showOrder?'':'none'
+  if(showOrder){
+    const isHidden=fm.hidden==='true'||fm.hidden===true
+    applyHiddenBtn(isHidden)
+    hiddenCache[path]=isHidden
+    markHiddenInSidebar(path,isHidden)
+  }
   renderPreview()
   document.getElementById('toolbar').style.display='flex'
   document.getElementById('panes').style.display='flex'
@@ -541,6 +554,13 @@ async function saveFile(){
   else content=removeFrontmatterField(content,'tags')
   const dateVal=document.getElementById('date-input').value
   content=dateVal?setFrontmatterField(content,'date',dateVal):removeFrontmatterField(content,'date')
+  // hidden field
+  const hiddenBtn=document.getElementById('hidden-btn')
+  if(hiddenBtn.style.display!=='none'){
+    const isHidden=hiddenBtn.dataset.hidden==='1'
+    content=isHidden?setFrontmatterField(content,'hidden','true'):removeFrontmatterField(content,'hidden')
+    hiddenCache[curPath]=isHidden
+  }
   document.getElementById('editor').value=content
 
   // ── 分区迁移判断 ──
@@ -780,6 +800,30 @@ function parseMD(md){
     .replace(/^[-*] (.+)$/gm,'<li>$1</li>').replace(/(<li>.*?<\/li>\n?)+/gs,s=>`<ul>${s}</ul>`)
     .replace(/\n\n(?!<)/g,'</p><p>')
   return`<p>${h}</p>`
+}
+// ── Hidden helpers ────────────────────────────────────────────────────
+function applyHiddenBtn(hidden){
+  const btn=document.getElementById('hidden-btn')
+  btn.dataset.hidden=hidden?'1':'0'
+  if(hidden){btn.textContent='🚫 已隐藏';btn.className='btn-d btn-sm';btn.style.whiteSpace='nowrap'}
+  else{btn.textContent='👁 显示中';btn.className='btn-s btn-sm';btn.style.whiteSpace='nowrap'}
+}
+function toggleHidden(){
+  const btn=document.getElementById('hidden-btn')
+  applyHiddenBtn(btn.dataset.hidden!=='1')
+}
+function markHiddenInSidebar(path,hidden){
+  document.querySelectorAll('.file-item').forEach(i=>{
+    if(i.dataset.path!==path)return
+    const old=i.querySelector('.hidden-icon');if(old)old.remove()
+    if(hidden){
+      const ic=document.createElement('span')
+      ic.className='hidden-icon'
+      ic.textContent='🚫'
+      ic.style.cssText='font-size:10px;margin-left:3px;opacity:.6'
+      const fn=i.querySelector('.file-name');if(fn)fn.after(ic)
+    }
+  })
 }
 function setStatus(msg,type){const el=document.getElementById('status');el.textContent=msg;el.className=`statusbar ${type}`}
 </script>

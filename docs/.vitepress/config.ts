@@ -6,6 +6,7 @@ const sidebarOptions = {
   useTitleFromFileHeading: true,
   useFolderTitleFromIndexFile: true,
   excludeFiles: ['index.md'],
+  excludeFilesByFrontmatterFieldName: 'hidden',
   sortMenusByFrontmatterOrder: true,
   frontmatterOrderDefaultValue: 99,
   collapsed: false,

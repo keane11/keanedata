@@ -13,7 +13,7 @@ export { data }
 export default createContentLoader(['ai/*.md', 'notes/*.md', 'projects/*.md', 'productivity/*.md'], {
   transform(raw) {
     return raw
-      .filter(p => p.frontmatter.date && !p.url.endsWith('/index') && p.frontmatter.layout !== 'home')
+      .filter(p => p.frontmatter.date && !p.url.endsWith('/index') && p.frontmatter.layout !== 'home' && !p.frontmatter.hidden)
       .sort((a, b) => +new Date(b.frontmatter.date as string) - +new Date(a.frontmatter.date as string))
       .slice(0, 6)
       .map(p => ({
