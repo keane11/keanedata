@@ -1,3 +1,8 @@
+---
+title: team management solution
+hidden: true
+---
+
 # 软件团队管理实操方案
 
 > 适用场景：7 人嵌入式软件团队、芯片方案公司、多客户项目并行
