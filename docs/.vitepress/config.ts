@@ -48,8 +48,8 @@ const sidebar = generateSidebar([
 ])
 
 export default defineConfig({
-  title: 'Keane 的技术笔记',
-  description: 'AI 平台配置 · 编程笔记 · 项目实战',
+  title: 'Keane 的折腾手记',
+  description: 'AI 工具 · 服务器实战 · 效率工具 · 内容变现',
   lang: 'zh-CN',
   ignoreDeadLinks: true,
   lastUpdated: true,
@@ -63,7 +63,7 @@ export default defineConfig({
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
     ['meta', { name: 'theme-color', content: '#4f6ef7' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:site_name', content: 'Keane 的技术笔记' }],
+    ['meta', { property: 'og:site_name', content: 'Keane 的折腾手记' }],
     ['meta', { name: 'twitter:card', content: 'summary' }],
   ],
 

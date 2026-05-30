@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-  name: "Keane 的技术笔记"
-  text: "记录，是最好的沉淀"
-  tagline: AI 平台配置 · 编程笔记 · 项目实战
+  name: "Keane 的折腾手记"
+  text: "折腾，是最好的成长"
+  tagline: AI 工具 · 服务器实战 · 效率工具 · 内容变现
   actions:
     - theme: brand
       text: 开始阅读
