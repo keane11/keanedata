@@ -171,6 +171,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
           placeholder="博客显示标题"
           style="flex:2;min-width:140px;font-weight:500"
           title="修改这里即可改变文章在博客侧边栏和页面中显示的名称">
+        <label id="group-label" style="font-size:12px;color:var(--muted);margin-bottom:0;white-space:nowrap;display:none">分组</label>
+        <select id="group-select" class="toolbar-input" title="侧边栏导航分组" style="flex:0;width:auto;display:none">
+          <option value="">— 不加入导航 —</option>
+        </select>
         <label style="font-size:12px;color:var(--muted);margin-bottom:0;white-space:nowrap">排序</label>
         <input id="order-input" type="number" class="toolbar-input" placeholder="99" min="1" max="999" title="数字越小越靠前">
         <input id="desc-input" type="text" class="toolbar-input" placeholder="文章简介（description，≤120字）" style="flex:3;min-width:180px">
@@ -205,11 +209,15 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <div class="dialog">
     <h3>新建文章</h3>
     <label>分区</label>
-    <select id="new-section">
+    <select id="new-section" onchange="onNewSectionChange()">
       <option value="ai">AI 平台</option>
       <option value="notes">编程笔记</option>
       <option value="projects">项目实战</option>
       <option value="productivity">生产力工具</option>
+    </select>
+    <label>加入侧边栏分组</label>
+    <select id="new-group-select">
+      <option value="">— 稍后手动指定 —</option>
     </select>
     <label>文章标题</label>
     <input id="new-title" type="text" placeholder="例：DeepSeek 使用指南">
@@ -281,6 +289,8 @@ const TITLE_CACHE_KEY='blog_admin_titles'
 let token='', curPath='', curSha='', uploadContent=''
 const titleCache={}   // path → frontmatter title，用于侧边栏刷新后保留标题
 const hiddenCache={}  // path → boolean，记录已打开文章的隐藏状态
+const SGPATH='docs/.vitepress/sidebar-groups.json'
+let sgData=null, sgSha=''  // sidebar-groups.json 缓存
 // 从 sessionStorage 恢复上次会话的标题缓存（刷新页面内仍有效）
 try{Object.assign(titleCache,JSON.parse(sessionStorage.getItem(TITLE_CACHE_KEY)||'{}'))}catch{}
 function setTitleCache(path,title){
@@ -367,7 +377,46 @@ function resetSetup(){if(!confirm('清除已保存的密码和 Token？'))return
 async function enterApp(){
   document.getElementById('screen').style.display='none'
   document.getElementById('app').style.display='flex'
+  loadSidebarGroups()   // 预加载，不阻塞
   await loadList()
+}
+
+// ── Sidebar Groups ────────────────────────────────────────────────────
+async function loadSidebarGroups(){
+  if(sgData) return sgData
+  const r=await api(`contents/${SGPATH}`)
+  if(!r.ok) return null
+  const d=await r.json()
+  sgSha=d.sha
+  try{ sgData=JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))))) }catch{}
+  return sgData
+}
+function linkFromPath(path){ return '/'+path.replace(/\.md$/,'') }
+function populateGroupSel(secKey,selId,currentLink){
+  const sel=document.getElementById(selId);if(!sel)return
+  sel.innerHTML='<option value="">— 不加入导航 —</option>'
+  if(!sgData||!sgData[secKey])return
+  sgData[secKey].forEach((g,i)=>{
+    const opt=document.createElement('option')
+    opt.value=String(i); opt.textContent=g.text
+    if(currentLink&&g.items&&g.items.some(item=>item.link===currentLink)) opt.selected=true
+    sel.appendChild(opt)
+  })
+}
+function syncArticleInGroups(secKey,link,title,newGroupIdx){
+  if(!sgData||!sgData[secKey])return
+  sgData[secKey].forEach(g=>{ if(g.items) g.items=g.items.filter(item=>item.link!==link) })
+  if(newGroupIdx>=0&&sgData[secKey][newGroupIdx])
+    sgData[secKey][newGroupIdx].items.push({text:title,link})
+}
+async function saveSidebarGroups(msg){
+  if(!sgData) return false
+  const body={message:msg||'docs: update sidebar navigation',
+    content:btoa(unescape(encodeURIComponent(JSON.stringify(sgData,null,2)))),branch:BRANCH}
+  if(sgSha) body.sha=sgSha
+  const r=await api(`contents/${SGPATH}`,'PUT',body)
+  if(r.ok){const d=await r.json();sgSha=d.content.sha;return true}
+  return false
 }
 
 // ── API ───────────────────────────────────────────────────────────────
@@ -475,6 +524,13 @@ function loadEditor(path,sha,content,showOrder){
   const rawTags=fm.tags||'';document.getElementById('tags-input').value=rawTags.replace(/^\[|\]$/g,'')
   document.getElementById('date-input').value=fm.date||''
   document.getElementById('del-btn').style.display=showOrder?'':'none'
+  // 分组选择器（仅文章显示）
+  const groupSel=document.getElementById('group-select')
+  const groupLbl=document.getElementById('group-label')
+  if(showOrder&&secKey&&sgData){
+    groupSel.style.display=''; groupLbl.style.display=''
+    populateGroupSel(secKey,'group-select',linkFromPath(path))
+  }else{ groupSel.style.display='none'; groupLbl.style.display='none' }
   // hidden 按钮（仅文章显示）
   const hiddenBtn=document.getElementById('hidden-btn')
   hiddenBtn.style.display=showOrder?'':'none'
@@ -604,6 +660,18 @@ async function saveFile(){
   document.getElementById('path-badge').textContent=curPath
   if(titleVal) setTitleCache(curPath,titleVal)
 
+  // 同步侧边栏分组
+  const groupSel=document.getElementById('group-select')
+  if(groupSel.style.display!=='none'&&sgData){
+    const secKeyForGroup=Object.keys(SECTIONS).find(k=>curPath.startsWith(SECTIONS[k].path+'/'))
+    if(secKeyForGroup){
+      const link=linkFromPath(curPath)
+      const newGIdx=groupSel.value!==''?parseInt(groupSel.value):-1
+      syncArticleInGroups(secKeyForGroup,link,titleVal||link.split('/').pop(),newGIdx)
+      await saveSidebarGroups(`docs: update sidebar nav for ${curPath.split('/').pop()}`)
+    }
+  }
+
   await loadList()
   document.querySelectorAll('.file-item').forEach(i=>{
     if(i.dataset.path===curPath){
@@ -624,7 +692,13 @@ async function deleteFile(){
     message:`docs: delete ${curPath.split('/').pop()}`,sha:curSha,branch:BRANCH})
   if(r.ok){
     const secKey=Object.keys(SECTIONS).find(k=>curPath.startsWith(SECTIONS[k].path+'/'))
-    if(secKey) await removeFromSectionIndex(secKey,curPath.split('/').pop().replace(/\.md$/,''))
+    if(secKey){
+      await removeFromSectionIndex(secKey,curPath.split('/').pop().replace(/\.md$/,''))
+      if(sgData){
+        syncArticleInGroups(secKey,linkFromPath(curPath),'',-1)
+        saveSidebarGroups(`docs: remove ${curPath.split('/').pop()} from sidebar nav`)
+      }
+    }
     delTitleCache(curPath)
     curPath='';curSha=''
     document.getElementById('toolbar').style.display='none'
@@ -683,7 +757,14 @@ function titleToSlug(t){
 function openNewDlg(){
   document.getElementById('new-title').value=''
   document.getElementById('new-slug').value=''
+  const sec=document.getElementById('section-select').style.display!=='none'
+    ? document.getElementById('section-select').value : 'ai'
+  document.getElementById('new-section').value=sec
+  populateGroupSel(sec,'new-group-select',null)
   document.getElementById('new-dlg').classList.add('open')
+}
+function onNewSectionChange(){
+  populateGroupSel(document.getElementById('new-section').value,'new-group-select',null)
 }
 function closeDlg(id){
   const el=document.getElementById(id);el.classList.remove('open')
@@ -705,6 +786,12 @@ async function createFile(){
     closeDlg('new-dlg')
     const d=await r.json()
     await updateSectionIndex(section,slug,title)
+    // 加入侧边栏分组
+    const newGIdx=document.getElementById('new-group-select').value
+    if(newGIdx!==''&&sgData){
+      syncArticleInGroups(section,linkFromPath(path),title,parseInt(newGIdx))
+      await saveSidebarGroups(`docs: add ${slug} to sidebar nav`)
+    }
     await loadList()
     document.querySelectorAll('.file-item').forEach(i=>i.classList[i.dataset.path===path?'add':'remove']('active'))
     loadEditor(path,d.content.sha,tpl,true)

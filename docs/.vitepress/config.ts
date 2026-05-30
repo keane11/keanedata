@@ -4,6 +4,8 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { resolve, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+const sg = JSON.parse(readFileSync(resolve(fileURLToPath(new URL('.', import.meta.url)), 'sidebar-groups.json'), 'utf-8')) as any
+
 // 构建期扫描所有 .md 文件，收集 hidden: true 的文章路径，加入 srcExclude
 // 这样 VitePress 根本不会生成对应 HTML，直接访问 URL 也会 404
 const docsDir = fileURLToPath(new URL('..', import.meta.url))
@@ -94,117 +96,10 @@ export default defineConfig({
 
     sidebar: {
       ...sidebar,
-      '/ai/': [
-        {
-          text: '🚀 新手入门',
-          collapsed: false,
-          items: [
-            { text: '前置准备：VPN · 接码 · 虚拟信用卡', link: '/ai/ai-account-prerequisites' },
-            { text: 'Google 账号注册全流程', link: '/ai/google-account-register' },
-            { text: 'ChatGPT / Claude / Gemini 注册与订阅', link: '/ai/chatgpt-claude-gemini-register' },
-          ],
-        },
-        {
-          text: '🤖 主流 AI 平台',
-          collapsed: false,
-          items: [
-            { text: 'Claude 使用指南', link: '/ai/claude' },
-            { text: 'OpenAI 使用指南', link: '/ai/openai' },
-            { text: 'Gemini 使用指南', link: '/ai/gemini' },
-          ],
-        },
-        {
-          text: '🛠 工具选型',
-          collapsed: false,
-          items: [
-            { text: 'AI 编程工具横评（Cursor vs Copilot vs Claude Code）', link: '/ai/ai-coding-tools-compare' },
-          ],
-        },
-        {
-          text: '⚙️ 工具部署',
-          collapsed: false,
-          items: [
-            { text: 'WSL 安装 AI CLI 工具', link: '/ai/wsl_ai_cli_教程' },
-            { text: 'CC Switch 切换国产模型', link: '/ai/cc_switch_claude_code_国产模型切换流程' },
-            { text: 'DeepSeek TUI / CodeWhale WSL 安装', link: '/ai/deepseek-tui-wsl' },
-          ],
-        },
-        {
-          text: '📐 方法论',
-          collapsed: false,
-          items: [
-            { text: '提示词工程指南', link: '/ai/prompt' },
-            { text: 'Hermes Agent 配置指南', link: '/ai/hermes' },
-            { text: 'HARNESS 工作流完整指南', link: '/ai/HARNESS_WorkFlow' },
-          ],
-        },
-      ],
-      '/notes/': [
-        {
-          text: '🐍 通用开发',
-          collapsed: false,
-          items: [
-            { text: 'Python 笔记', link: '/notes/python' },
-            { text: 'Git 笔记', link: '/notes/git' },
-            { text: 'Docker 笔记', link: '/notes/docker' },
-            { text: 'Linux 笔记', link: '/notes/linux' },
-          ],
-        },
-        {
-          text: '🔧 嵌入式开发',
-          collapsed: false,
-          items: [
-            { text: 'C 语言嵌入式开发笔记', link: '/notes/c_embedded' },
-            { text: 'FreeRTOS 开发笔记', link: '/notes/freertos' },
-            { text: 'RISC-V 嵌入式开发笔记', link: '/notes/riscv' },
-            { text: 'cJSON 移植指南', link: '/notes/cjson_porting_guide' },
-            { text: '中科蓝讯芯片数据库', link: '/notes/bluetrum_chip_db' },
-          ],
-        },
-      ],
-      '/projects/': [
-        {
-          text: '🌐 博客与工具',
-          collapsed: false,
-          items: [
-            { text: '博客搭建方案', link: '/projects/blog_plan' },
-            { text: 'QR 共享文件夹设计方案', link: '/projects/qr_file_design' },
-          ],
-        },
-        {
-          text: '🔩 嵌入式项目',
-          collapsed: false,
-          items: [
-            { text: 'BSP I2C Slave 移植手册', link: '/projects/bsp_i2c_slave_porting_guide' },
-          ],
-        },
-      ],
-      '/productivity/': [
-        {
-          text: '🖥️ 云与服务器',
-          collapsed: false,
-          items: [
-            { text: 'ECS 云服务器搭建', link: '/productivity/ecs-server' },
-            { text: 'KVM VPS 部署指南（含 3X-UI）', link: '/productivity/KVM-VPS-部署完整流程' },
-          ],
-        },
-        {
-          text: '✍️ AI 内容创作',
-          collapsed: false,
-          items: [
-            { text: 'AI 写中文网文', link: '/productivity/ai-novel' },
-            { text: 'AI 短剧 / 视频生成', link: '/productivity/ai-video' },
-          ],
-        },
-        {
-          text: '💰 变现与副业',
-          collapsed: false,
-          items: [
-            { text: '抖音切片上架橱窗', link: '/productivity/douyin-showcase' },
-            { text: '副业 & 自动化工具推荐', link: '/productivity/tools-automation' },
-          ],
-        },
-      ],
+      '/ai/':           sg.ai,
+      '/notes/':        sg.notes,
+      '/projects/':     sg.projects,
+      '/productivity/': sg.productivity,
       '/tools/': [
         {
           text: '🔨 开发工具',
