@@ -15,6 +15,7 @@ title: index
 ## 工具与部署
 
 - [WSL 安装 AI CLI 工具](./wsl_ai_cli_教程) — WSL + Ubuntu 环境下安装 Claude Code / Codex / Gemini CLI
+- [DeepSeek TUI / CodeWhale WSL 安装](./deepseek-tui-wsl) — Ubuntu 22.04 glibc 版本不兼容时的 Cargo 编译安装方案
 - [CC Switch 切换国产模型](./cc_switch_claude_code_国产模型切换流程) — Claude Code 切换 DeepSeek 等国产模型
 - [Hermes Agent 配置指南](./hermes) — DeepSeek + 微信 Gateway + Gemini 备选完整部署
 
