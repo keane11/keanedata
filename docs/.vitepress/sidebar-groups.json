@@ -40,7 +40,8 @@
       "items": [
         { "text": "提示词工程指南", "link": "/ai/prompt" },
         { "text": "Hermes Agent 配置指南", "link": "/ai/hermes" },
-        { "text": "HARNESS 工作流完整指南", "link": "/ai/HARNESS_WorkFlow" }
+        { "text": "HARNESS 工作流完整指南", "link": "/ai/HARNESS_WorkFlow" },
+        { "text": "产品选型 Agent 架构指南", "link": "/ai/agent_architecture" }
       ]
     }
   ],
