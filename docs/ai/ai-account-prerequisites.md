@@ -84,7 +84,7 @@ https://ipinfo.io
 **1. 注册 SMS-Activate**
 
 访问 [sms-activate.io](https://sms-activate.io)，用邮箱注册账号。
-
+备用链接：[hero-sms](https://hero-sms.com/cn/purchases/numbers)
 **2. 充值（支持支付宝）**
 
 点右上角"充值" → 选支付宝 → 最低充 $1–2 够用几次。
