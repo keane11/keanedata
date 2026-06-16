@@ -1,6 +1,6 @@
 ---
 title: WSL 安装 AI CLI 工具完整教程
-description: Windows WSL2 + Ubuntu 环境下安装 Claude Code、Codex CLI、Gemini CLI 完整教程
+description: Windows WSL2 + Ubuntu 环境下安装 Claude Code、Codex CLI、Antigravity CLI（原 Gemini CLI）完整教程
 date: 2026-04-21
 tags: [WSL, CLI, AI]
 order: 4
@@ -9,8 +9,8 @@ order: 4
 # WSL + Ubuntu 安装 AI CLI 工具完整教程
 
 > 适用环境：Windows 10 (2004+) / Windows 11 + WSL 2 + Ubuntu 24.04 LTS  
-> 涵盖工具：Claude Code · OpenAI Codex CLI · Gemini CLI · GitHub Copilot CLI  
-> 更新日期：2026-04-21
+> 涵盖工具：Claude Code · OpenAI Codex CLI · Antigravity CLI（原 Gemini CLI）· GitHub Copilot CLI  
+> 更新日期：2026-06-16
 
 ---
 
@@ -23,7 +23,7 @@ order: 4
 5. [安装 Node.js（所有 CLI 的依赖）](#5-安装-nodejs所有-cli-的依赖)
 6. [Claude Code（Anthropic）](#6-claude-codeanthropic)
 7. [Codex CLI（OpenAI）](#7-codex-cliopenai)
-8. [Gemini CLI（Google）](#8-gemini-cligoogle)
+8. [Antigravity CLI（Google，接替 Gemini CLI）](#8-antigravity-cligoogle接替-gemini-cli)
 9. [GitHub Copilot CLI](#9-github-copilot-cli)
 10. [多工具并存配置](#10-多工具并存配置)
 11. [Windows Terminal 配置](#11-windows-terminal-配置)
@@ -153,7 +153,7 @@ wsl --shutdown
 
 ## 5. 安装 Node.js（所有 CLI 的依赖）
 
-Claude Code、Codex CLI 和 Gemini CLI 均基于 Node.js，建议用 **nvm** 管理版本。
+Claude Code、Codex CLI、GitHub Copilot CLI 均基于 Node.js，建议用 **nvm** 管理版本。（Antigravity CLI 是 Go 编译的独立二进制，不依赖 Node，可跳过本步骤单独安装。）
 
 ```bash
 # 安装 nvm
@@ -304,86 +304,89 @@ codex --help
 
 ---
 
-## 8. Gemini CLI（Google）
+## 8. Antigravity CLI（Google，接替 Gemini CLI）
 
-Gemini CLI 是 Google 推出的终端 AI 助手，支持超长上下文（100 万 token），适合大型代码库分析，Google 账号登录有较高免费额度。
+::: danger 重要变更（2026-06）
+Google 将于 **2026 年 6 月 18 日**停止向个人用户（Google AI Pro / Ultra 及免费版 Gemini Code Assist）提供旧版 **Gemini CLI**（`@google/gemini-cli`），由新一代 **Antigravity CLI**（命令 `agy`）接替。
 
-### 安装
+- **受影响**：用 Google 账号免费登录或个人订阅的用户——6/18 后旧版 `gemini` 将无法调用，请尽快迁移。
+- **不受影响**：企业版授权用户，以及使用**付费 Gemini API Key** 认证的用户，仍可继续使用旧版 Gemini CLI。
+
+Antigravity CLI 是 Google 基于 Antigravity 平台推出的新一代终端 AI 助手。与旧版不同，它是 **Go 编译的独立二进制**，不再依赖 Node.js，启动更快，并支持多 Agent 协作。
+:::
+
+### 卸载旧版 Gemini CLI（如已安装）
 
 ```bash
-npm install -g @google/gemini-cli
-gemini --version
+npm uninstall -g @google/gemini-cli
+```
+
+### 安装 Antigravity CLI
+
+```bash
+curl -fsSL https://antigravity.google/cli/install.sh | bash
+```
+
+安装后二进制位于 `~/.local/bin/`，**命令名为 `agy`**（注意：不是 `antigravity`，这一点很容易踩坑）。
+
+确保 `~/.local/bin` 在 PATH 中，并验证：
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+agy --version
 ```
 
 ### 配置认证
 
-**方式一：Google 账号登录（推荐，有免费额度）**
+**方式一：Google 账号登录（推荐）**
 
 ```bash
-gemini
-# 首次运行会自动打开浏览器完成 Google OAuth 登录
+agy
+# 桌面环境会自动打开浏览器完成 OAuth 登录；
+# WSL / SSH 等无浏览器环境会打印一条授权链接，
+# 复制到本机浏览器登录后即可完成认证。
 ```
 
-**方式二：API Key**
+**方式二：API Key（自动化 / 无浏览器场景）**
 
 前往 [aistudio.google.com](https://aistudio.google.com) 获取 API Key：
 
 ```bash
-echo 'export GEMINI_API_KEY="AIzaxxxxxxxx"' >> ~/.bashrc
+echo 'export ANTIGRAVITY_API_KEY="AIzaxxxxxxxx"' >> ~/.bashrc
 source ~/.bashrc
 ```
+
+> ⚠️ 环境变量名 `ANTIGRAVITY_API_KEY` 目前仅见于第三方资料、尚未在官方文档明确，使用前请以 `agy --help` 或官方文档为准。
 
 ### 常用命令
 
 ```bash
 # 启动交互式会话
-gemini
+agy
 
 # 单次提问
-gemini "解释 WSL 2 和虚拟机的区别"
+agy "解释 WSL 2 和虚拟机的区别"
 
 # 读取文件内容作为上下文
-gemini "总结这个项目的架构" < README.md
+agy "总结这个项目的架构" < README.md
 
 # 传入多个文件
-cat src/*.py | gemini "找出这些文件中的潜在 Bug"
+cat src/*.py | agy "找出这些文件中的潜在 Bug"
 
-# 指定模型
-gemini --model gemini-2.5-pro "对这份代码做全面的性能分析"
-gemini --model gemini-2.5-flash "快速生成单元测试"
-
-# 关闭联网搜索（仅用本地上下文）
-gemini --no-search "解释这段正则表达式"
-
-# 输出为 JSON 格式（适合脚本处理）
-gemini --json "列出这段代码的所有函数名及其功能"
-
-# 调整输出长度
-gemini --max-output-tokens 2048 "详细解释这个算法"
-
-# 查看帮助
-gemini --help
+# 查看全部命令与参数
+agy --help
 ```
 
-### 交互模式内常用指令
+> Antigravity CLI 仍在快速迭代，旧版 `gemini` 的 `--model`、`--json`、`--no-search` 等参数不一定原样保留。具体可用参数请以 `agy --help` 的实际输出为准。
 
-| 指令 | 功能 |
-|------|------|
-| `/help` | 查看所有指令 |
-| `/clear` | 清空对话 |
-| `/model` | 切换模型 |
-| `/tools` | 查看已启用的工具 |
-| `/memory` | 管理长期记忆 |
-| `/quit` | 退出 |
+### 配置文件迁移
 
-### 主要特点
+- 项目级上下文文件 **`GEMINI.md` 仍然有效**，同时新增支持通用的 `AGENTS.md`。
+- 全局配置、MCP 配置、Skills 等迁移到 `~/.gemini/antigravity-cli/` 目录下。
+- ⚠️ 迁移 MCP 服务器时，配置字段需把 `url` 改名为 `serverUrl`，否则启动时会**静默失败**（不报错但连不上）。
 
-| 特性 | 说明 |
-|------|------|
-| 超长上下文 | 最多 100 万 token，可加载整个代码库 |
-| 免费额度 | Google 账号登录每分钟 60 次请求 |
-| 多模态 | 支持图片、PDF、代码混合输入 |
-| Google 搜索 | 可联网实时检索信息 |
+> 上述配置路径与字段为社区整理，置信度有限，请以 [Antigravity 官方文档](https://antigravity.google) 为准。
 
 ---
 
@@ -492,7 +495,7 @@ ghce "grep -rn --include='*.js' 'TODO' ."
 # ── AI CLI API Keys ───────────────────────────
 export ANTHROPIC_API_KEY="sk-ant-xxxxxxxx"
 export OPENAI_API_KEY="sk-xxxxxxxx"
-export GEMINI_API_KEY="AIzaxxxxxxxx"
+export ANTIGRAVITY_API_KEY="AIzaxxxxxxxx"   # Antigravity CLI（原 Gemini CLI）
 # GitHub Copilot 通过 gh auth login 管理，无需手动配置
 ```
 
@@ -502,7 +505,7 @@ export GEMINI_API_KEY="AIzaxxxxxxxx"
 |---------|---------|
 | 复杂多步骤编程任务、文件级操作 | Claude Code |
 | 代码自动重构、全自动任务执行 | Codex CLI |
-| 大型代码库分析、超长文档处理 | Gemini CLI |
+| 大型代码库分析、超长文档处理 | Antigravity CLI（原 Gemini CLI） |
 | Shell 命令生成与解释、Git 操作 | GitHub Copilot CLI |
 
 ### 一键验证所有工具
@@ -511,7 +514,7 @@ export GEMINI_API_KEY="AIzaxxxxxxxx"
 echo "=== AI CLI 环境检查 ===" && \
 printf "Claude Code : " && claude --version 2>/dev/null || echo "未安装" && \
 printf "Codex CLI   : " && codex --version 2>/dev/null || echo "未安装" && \
-printf "Gemini CLI  : " && gemini --version 2>/dev/null || echo "未安装" && \
+printf "Antigravity : " && agy --version 2>/dev/null || echo "未安装" && \
 printf "gh Copilot  : " && gh copilot --version 2>/dev/null || echo "未安装"
 ```
 
@@ -607,7 +610,7 @@ npm config set registry https://registry.npmmirror.com
 # 确认环境变量已加载
 echo $ANTHROPIC_API_KEY
 echo $OPENAI_API_KEY
-echo $GEMINI_API_KEY
+echo $ANTIGRAVITY_API_KEY
 
 # 若为空，手动重载
 source ~/.bashrc

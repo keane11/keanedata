@@ -77,7 +77,7 @@ hidden: true
   - 个人开发者推荐组合
 
 - [ ] **[WSL 安装 AI CLI 工具](/ai/wsl_ai_cli_教程)**
-  - Claude Code / Codex / Gemini CLI 安装
+  - Claude Code / Codex / Antigravity CLI（原 Gemini CLI）安装
 
 - [ ] **[DeepSeek TUI / CodeWhale WSL 安装](/ai/deepseek-tui-wsl)**
   - glibc 版本不兼容时的 Cargo 编译方案

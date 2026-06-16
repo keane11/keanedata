@@ -20,11 +20,11 @@ title: index
 
 - [Claude](./claude) — Anthropic 出品，擅长长文本分析和代码；含 Claude Code CLI 深度指南
 - [OpenAI](./openai) — GPT 系列，应用生态最丰富；含 Codex CLI 使用指南
-- [Gemini](./gemini) — Google 出品，超长上下文，原生多模态；含 Gemini CLI 使用指南
+- [Gemini](./gemini) — Google 出品，超长上下文，原生多模态；含 Antigravity CLI（原 Gemini CLI）迁移指南
 
 ## 工具与部署
 
-- [WSL 安装 AI CLI 工具](./wsl_ai_cli_教程) — WSL + Ubuntu 环境下安装 Claude Code / Codex / Gemini CLI
+- [WSL 安装 AI CLI 工具](./wsl_ai_cli_教程) — WSL + Ubuntu 环境下安装 Claude Code / Codex / Antigravity CLI（原 Gemini CLI）
 - [DeepSeek TUI / CodeWhale WSL 安装](./deepseek-tui-wsl) — Ubuntu 22.04 glibc 版本不兼容时的 Cargo 编译安装方案
 - [CC Switch 切换国产模型](./cc_switch_claude_code_国产模型切换流程) — Claude Code 切换 DeepSeek 等国产模型
 - [Hermes Agent 配置指南](./hermes) — DeepSeek + 微信 Gateway + Gemini 备选完整部署
