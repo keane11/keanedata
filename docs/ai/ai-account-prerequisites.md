@@ -161,7 +161,7 @@ https://ipinfo.io
 
 在 ChatGPT/Claude 的订阅页面填入卡号/有效期/CVV，账单地址用美国免税州地址即可。
 
-> ⚠️ **账单地址建议**：用免税州地址（俄勒冈 OR、蒙大拿 MT），避免被收额外税费。可以用 [fakena.me](https://www.fakena.me) 生成。
+> ⚠️ **账单地址建议**：用免税州地址（俄勒冈 OR、蒙大拿 MT），避免被收额外税费。可以用 [meiguodizhi.com](https://www.meiguodizhi.com/) 或 [usaddressgen.com](https://usaddressgen.com/) 生成。
 
 ### 各平台订阅价格参考（2026 年 11 月）
 
@@ -190,7 +190,7 @@ https://ipinfo.io
 
 **注册不需要 VPN，直接用国内网络操作即可。**
 
-1. 打开浏览器（建议无痕模式），访问 [appleid.apple.com](https://appleid.apple.com) → **"创建你的 Apple ID"**
+1. 打开浏览器（建议无痕模式），访问 [account.apple.com](https://account.apple.com/) → **"创建你的 Apple 账户"**
 
 2. 填写基本信息：
 
@@ -207,8 +207,8 @@ https://ipinfo.io
 
 4. **账单地址（关键）**：
    - 付款方式选 **"None（无）"**
-   - 地址选免税州：**俄勒冈（Oregon）** 或 **蒙大拿（Montana）**，可用 [fakena.me](https://www.fakena.me) 一键生成
-   - 电话填 fakena.me 生成的当地号码即可
+   - 地址选免税州：**俄勒冈（Oregon）** 或 **蒙大拿（Montana）**，可用 [meiguodizhi.com](https://www.meiguodizhi.com/) 或 [usaddressgen.com](https://usaddressgen.com/) 一键生成
+   - 电话填生成器提供的当地号码即可
 
 5. 点击继续，账号创建完成
 
@@ -256,7 +256,7 @@ https://ipinfo.io
 
 #### 第一阶段：注册中国大陆 Apple ID
 
-1. 访问 [appleid.apple.com](https://appleid.apple.com) → 创建 Apple ID
+1. 访问 [account.apple.com](https://account.apple.com/) → 创建 Apple 账户
 2. 国家/地区选**中国大陆**，用 Gmail/Outlook 邮箱注册
 3. 手机号填 +86 国内号码，完成邮箱 + 手机验证
 4. 账号注册完成（此时是国区账号）

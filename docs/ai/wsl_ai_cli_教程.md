@@ -191,7 +191,7 @@ claude doctor
 
 ### 配置认证 / API Key
 
-支持直接运行 `claude` 通过 Claude Pro / Max / Ultra 账号 OAuth 登录，或前往 [console.anthropic.com](https://console.anthropic.com) 获取 API Key：
+支持直接运行 `claude` 通过 Claude Pro / Max / Ultra 账号 OAuth 登录，或前往 [platform.claude.com](https://platform.claude.com/) 获取 API Key：
 
 ```bash
 echo 'export ANTHROPIC_API_KEY="sk-ant-xxxxxxxx"' >> ~/.bashrc

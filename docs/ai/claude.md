@@ -27,7 +27,7 @@ order: 1
 | Claude Sonnet 5.5 | 性价比首选 | 日常编程、写作、对话 |
 | Claude Haiku 5.5 | 速度最快、成本极低 | 简单任务、高频批量调用 |
 
-> 旧版 Claude 4.x 系列（Opus 4 / Sonnet 4.6 / Haiku 4.5 等）已逐步被新一代替代，新项目建议直接选用最新稳定模型 ID（以 [Anthropic 官方文档](https://docs.anthropic.com) 为准）。
+> 旧版 Claude 4.x 系列（Opus 4 / Sonnet 4.6 / Haiku 4.5 等）已逐步被新一代替代，新项目建议直接选用最新稳定模型 ID（以 [Anthropic 官方文档](https://platform.claude.com/docs/) 为准）。
 
 ## 核心使用技巧
 
