@@ -1,3 +1,7 @@
 node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+
+# 本地规划草稿与根目录临时截图
+/BLOG_PLAN.md
+/*.png
