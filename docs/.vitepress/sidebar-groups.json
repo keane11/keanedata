@@ -139,7 +139,7 @@
   ],
   "projects": [
     {
-      "text": "🌐 博客与工具",
+      "text": "🌐 Web 与效率系统",
       "collapsed": false,
       "items": [
         {
@@ -149,16 +149,28 @@
         {
           "text": "QR 共享文件夹设计方案",
           "link": "/projects/qr_file_design"
+        },
+        {
+          "text": "轻量级研发项目管理系统（PMSys）",
+          "link": "/projects/lightweight_pmsys_practice"
         }
       ]
     },
     {
-      "text": "🔩 嵌入式项目",
+      "text": "🔩 嵌入式与硬核工具",
       "collapsed": false,
       "items": [
         {
           "text": "BSP I2C Slave 移植手册",
           "link": "/projects/bsp_i2c_slave_porting_guide"
+        },
+        {
+          "text": "纯 C 音频波形/频谱编辑器",
+          "link": "/projects/pcm_audio_editor"
+        },
+        {
+          "text": "Windows 私有 SCSI 升级协议逆向",
+          "link": "/projects/usb_scsi_upgrade_protocol_analysis"
         }
       ]
     }
