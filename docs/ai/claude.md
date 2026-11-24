@@ -1,7 +1,7 @@
 ---
 title: Claude 使用指南
 description: Anthropic Claude 使用指南，含 Claude Code CLI 深度教程、MCP 服务器配置与 Hooks 自动化
-date: 2026-05-13
+date: 2026-11-24
 tags: [AI, Claude]
 order: 1
 ---
@@ -14,17 +14,20 @@ order: 1
 
 | 方式 | 地址 | 说明 |
 |------|------|------|
-| 网页版 | [claude.ai](https://claude.ai) | 免费版每天有限额，Pro 版无限制 |
-| API | Anthropic API | 按 token 计费，适合集成到应用 |
-| CLI | Claude Code | 终端工具，专为编程场景设计 |
+| 网页版 | [claude.ai](https://claude.ai) | 免费版有限额；Pro 版（$20/月）有 5 小时/周滚动限额，重度使用可选 Max / Ultra |
+| API | Anthropic API | 按 token 计费（预充值），适合集成到应用 |
+| CLI | Claude Code | 官方原生终端 Agent 工具，专为编程场景设计 |
 
-## 模型选择
+## 模型选择（2026 年 11 月）
 
 | 模型 | 定位 | 适合场景 |
 |------|------|---------|
-| Claude Opus 4 | 最强推理 | 复杂分析、长文档、难题攻关 |
-| Claude Sonnet 4.6 | 性价比首选 | 日常编程、写作、对话 |
-| Claude Haiku 4.5 | 速度最快 | 简单任务、高频调用 |
+| Claude Fable 5.2 | 高阶研究与复杂迁移 | 深度研究、超复杂多步骤 Agent 任务 |
+| Claude Opus 5.5 | 旗舰编程与推理 | 复杂架构设计、长周期 Agent 编码、难题攻关 |
+| Claude Sonnet 5.5 | 性价比首选 | 日常编程、写作、对话 |
+| Claude Haiku 5.5 | 速度最快、成本极低 | 简单任务、高频批量调用 |
+
+> 旧版 Claude 4.x 系列（Opus 4 / Sonnet 4.6 / Haiku 4.5 等）已逐步被新一代替代，新项目建议直接选用最新稳定模型 ID（以 [Anthropic 官方文档](https://docs.anthropic.com) 为准）。
 
 ## 核心使用技巧
 
@@ -92,7 +95,7 @@ claude --continue
 claude --resume <session-id>
 
 # 指定模型
-claude --model claude-opus-4-7 "做代码架构评审"
+claude --model opus "做代码架构评审"
 
 # 跳过所有确认（自动化脚本场景，慎用）
 claude --dangerously-skip-permissions "重构整个 utils 模块"
@@ -146,22 +149,26 @@ claude --dangerously-skip-permissions "重构整个 utils 模块"
 
 ### MCP 服务器
 
-MCP（Model Context Protocol）让 Claude Code 连接外部数据源和工具：
+MCP（Model Context Protocol）让 Claude Code 连接外部数据源和工具，推荐直接通过 `claude mcp add` 命令管理（会自动写入用户级 `~/.claude.json` 或项目级 `.mcp.json`，**不是** `~/.claude/settings.json`）：
 
 ```bash
-# 在 ~/.claude/settings.json 配置 MCP 服务器
+# 添加本地 stdio MCP 服务器（文件系统 / GitHub / PostgreSQL 示例）
+claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /home/user
+claude mcp add github -e GITHUB_TOKEN=ghp_xxx -- npx -y @modelcontextprotocol/server-github
+claude mcp add postgres -- npx -y @modelcontextprotocol/server-postgres postgresql://user:pass@localhost/mydb
+
+# 查看已配置的 MCP 服务器
+claude mcp list
+
+# 在交互会话中管理 MCP 状态
+/mcp
+```
+
+如需团队共享，可在项目根目录提交 `.mcp.json`：
+
+```json
 {
   "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": { "GITHUB_TOKEN": "ghp_xxx" }
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres",
-               "postgresql://user:pass@localhost/mydb"]
-    },
     "filesystem": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/user"]
@@ -221,7 +228,7 @@ import anthropic
 client = anthropic.Anthropic(api_key="your-key")
 
 message = client.messages.create(
-    model="claude-sonnet-4-6",
+    model="claude-sonnet-5-5",  # 具体最新 model ID 以官方文档为准
     max_tokens=1024,
     messages=[
         {"role": "user", "content": "用 Python 写一个二分查找"}
@@ -231,8 +238,21 @@ message = client.messages.create(
 print(message.content[0].text)
 ```
 
-## 免费额度参考
+## 套餐与费用参考（2026 年 11 月）
 
-- **claude.ai 免费版**：每天约 20-30 条消息（Sonnet）
-- **API**：新账号有 $5 免费额度，用完需充值
-- **Claude Code**：需要 API Key 或 Claude.ai Pro 订阅
+### 个人订阅套餐（claude.ai）
+- **Free**：$0/月，每 5 小时及每周有限额
+- **Pro**：$20/月（年付约 $17/月），解锁 Opus、Projects 与 Claude Code 基础额度（有 5 小时/周限额，非无限制）
+- **Max**：$100/月，5x Pro 用量，附赠 $100/月 API 额度
+- **Ultra**：$200/月，10x Pro 周用量，无 5 小时滚动限额，附赠 $200/月 API 额度
+
+### API 参考价格（每百万 Token，需预充值，已无免费 $5 额度）
+
+| 模型 | 输入 | 输出 |
+|------|------|------|
+| Claude Haiku 5.5 | $0.10 | $0.50 |
+| Claude Sonnet 5.5 | $2.00 | $10.00 |
+| Claude Opus 5.5 | $4.00 | $20.00 |
+| Claude Fable 5.2 | $8.00 | $40.00 |
+
+> Prompt Caching（缓存命中）与 Batch API（异步批处理 5 折）可大幅降低实际开销。

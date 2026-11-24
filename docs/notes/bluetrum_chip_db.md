@@ -318,42 +318,41 @@ BT8912E (8Mbit) / BT8912F (16Mbit)
 ## 配套工具索引
 
 ### 下载工具
-| 工具 | 位置 |
+| 工具 | 目录/版本说明 |
 |------|------|
-| Downloader v3.5.5 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/downloader_v3.5.5/` |
-| Downloader v3.5.1 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/downloader_v3.5.1/` |
-| Downloader v3.3.8 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/downloader_v3.3.8_authoried/` |
-| Downloader v2.x | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/downloader_v2.9.8/` 等 |
-| USBDown v1.5 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/USBDown安装包-v1.5/` |
+| Downloader v3.5.5 | `<bluetrum_tools>/downloader_v3.5.5/` |
+| Downloader v3.5.1 | `<bluetrum_tools>/downloader_v3.5.1/` |
+| Downloader v3.3.8 | `<bluetrum_tools>/downloader_v3.3.8_authoried/` |
+| Downloader v2.x | `<bluetrum_tools>/downloader_v2.9.8/` 等 |
+| USBDown v1.5 | `<bluetrum_tools>/USBDown安装包-v1.5/` |
 
 ### 调试/产测工具
-| 工具 | 位置 |
+| 工具 | 目录/版本说明 |
 |------|------|
-| TSBox v284 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/tsbox_v284_20240430/` |
-| UartDump 2.0 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/UartDump 2.0/` |
-| 蓝牙测试盒 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/蓝牙测试盒使用说明书_V2.0_20200728.pdf` |
-| FCC 工具 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/FCC/` |
-| DebugData | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/DebugDatas/` |
+| TSBox v284 | `<bluetrum_tools>/tsbox_v284_20240430/` |
+| UartDump 2.0 | `<bluetrum_tools>/UartDump 2.0/` |
+| 蓝牙测试盒 | `<bluetrum_tools>/蓝牙测试盒使用说明书_V2.0_20200728.pdf` |
+| FCC 工具 | `<bluetrum_tools>/FCC/` |
+| DebugData | `<bluetrum_tools>/DebugDatas/` |
 
 ### 音效工具
-| 工具 | 位置 |
+| 工具 | 目录/版本说明 |
 |------|------|
-| Bluetrum DSP Tool v1.5.4 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/blueturm_dsp_tool_v1.5.4-20240408/` |
-| Equalizer v1.2.1 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/equalizer_v1.2.1/` |
-| GoldWave | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/goldwave/` |
+| Bluetrum DSP Tool v1.5.4 | `<bluetrum_tools>/blueturm_dsp_tool_v1.5.4-20240408/` |
+| Equalizer v1.2.1 | `<bluetrum_tools>/equalizer_v1.2.1/` |
+| GoldWave | `<bluetrum_tools>/goldwave/` |
 
 ### 其他工具
-| 工具 | 位置 |
+| 工具 | 目录/版本说明 |
 |------|------|
-| IDE 编译环境 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/IDE/` |
-| RV32 Toolchain v1.5.7 | `/mnt/e/Keane/中科蓝汛/中科蓝讯编译环境/rv32-toolchain_v1.5.7/` |
-| OTA 工具 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/ab-ota-demo_general_1.4/` |
-| ABControl v1.6.1 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/abcontrol_v1.6.1/` |
-| ABMate v1.2.1 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/abmate_v1.2.1/` |
-| XLink v2.0 | `/mnt/e/Keane/中科蓝汛/bluetrum_ tools/xlink_v2.0/` |
-| 加密狗 | `/mnt/e/Keane/中科蓝汛/加密狗/中科蓝讯加密狗使用说明_私钥配置/` |
+| IDE 编译环境 | `<bluetrum_tools>/IDE/` |
+| RV32 Toolchain v1.5.7 | `<toolchain_dir>/rv32-toolchain_v1.5.7/` |
+| OTA 工具 | `<bluetrum_tools>/ab-ota-demo_general_1.4/` |
+| ABControl v1.6.1 | `<bluetrum_tools>/abcontrol_v1.6.1/` |
+| ABMate v1.2.1 | `<bluetrum_tools>/abmate_v1.2.1/` |
+| XLink v2.0 | `<bluetrum_tools>/xlink_v2.0/` |
+| 加密狗 | `<dongle_dir>/中科蓝讯加密狗使用说明_私钥配置/` |
 
 ---
 
-> **使用方式：** 在 Hermes CLI 中输入 `@file:/mnt/d/Hermes/projects/bluetrum/bluetrum_chip_db.md` 即可快速查找芯片资料
-> 或运行 `python3 /mnt/d/Hermes/projects/bluetrum/bluetrum_query.py` 交互式搜索
+> **使用方式：** 在 Hermes CLI 中通过 `@file:<本地路径>/bluetrum_chip_db.md` 即可快速查找芯片资料，或配合本地检索脚本交互式搜索。

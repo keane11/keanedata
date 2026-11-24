@@ -1,30 +1,33 @@
 ---
 title: OpenAI 使用指南
 description: OpenAI GPT 系列使用指南，含 Codex CLI 审批模式配置和自动化工作流实战
-date: 2026-05-13
+date: 2026-11-24
 tags: [AI, OpenAI]
 order: 2
 ---
 
 # OpenAI 使用指南
 
-> GPT 系列模型，应用生态最为丰富，插件和第三方集成众多。
+> GPT 系列模型，应用生态最为丰富，覆盖通用对话、深度推理、原生多模态与 Codex 终端编程。
 
 ## 访问方式
 
 | 方式 | 地址 | 说明 |
 |------|------|------|
-| 网页版 | [chatgpt.com](https://chatgpt.com) | 免费版用 GPT-4o mini，Plus 版解锁全系列 |
-| API | platform.openai.com | 按 token 计费，需绑定信用卡 |
-| 客户端 | 桌面 / 移动 App | 与网页版同步，支持语音对话 |
+| 网页版 | [chatgpt.com](https://chatgpt.com) | Free / Go ($8) / Plus ($20) / Pro ($100–$500) 多档位 |
+| API | platform.openai.com | 按 token 计费，需绑定信用卡/预充值 |
+| 客户端 | 桌面 / 移动 App | 与网页版同步，支持实时语音与多模态 |
 
-## 模型选择
+## 模型选择（2026 年 11 月）
 
-| 模型 | 定位 | 适合场景 |
-|------|------|---------|
-| GPT-4o | 多模态旗舰 | 图文理解、日常编程、快速问答 |
-| o3 / o4-mini | 深度推理 | 数学竞赛、逻辑推理、复杂代码 |
-| GPT-4o mini | 轻量快速 | 简单任务、高频批量处理 |
+> 旧版 GPT-4o / GPT-4o mini / o3 / o4-mini 已逐步退场或由新一代原生推理架构替代。
+
+| 模型系列 | 定位 | 适合场景 |
+|----------|------|---------|
+| GPT-6 Astra（含 Pro 档） | 顶级深度推理与研究 | 复杂架构设计、长程规划、前沿科研与难题 |
+| GPT-6 Sol | 主力通用与推理 | 日常编程、复杂分析、图文多模态 |
+| GPT-6 Luna | 轻量高速、低成本 | 高频问答、批量处理、日常对话 |
+| GPT-5-Codex / Codex 系列 | 终端编程专用 | Codex CLI 自主编码、多文件重构 |
 
 ## 核心使用技巧
 
@@ -56,7 +59,7 @@ order: 2
 
 ```python
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-6-sol",  # 具体 model ID 以 platform.openai.com 最新文档为准
     response_format={"type": "json_object"},
     messages=[
         {"role": "system", "content": "你只返回 JSON，不说其他内容"},
@@ -94,7 +97,7 @@ from openai import OpenAI
 client = OpenAI(api_key="your-key")
 
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-6-sol",
     messages=[
         {"role": "system", "content": "你是一位 Python 专家"},
         {"role": "user", "content": "写一个读取 CSV 并计算平均值的脚本"}
@@ -108,7 +111,7 @@ print(response.choices[0].message.content)
 
 ```python
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-6-sol",
     messages=[{
         "role": "user",
         "content": [
@@ -121,98 +124,92 @@ response = client.chat.completions.create(
 
 ## Codex CLI
 
-Codex CLI 是 OpenAI 推出的终端编程助手，核心特色是精细的「审批模式」控制 AI 操作权限。安装方式见 [WSL 安装 AI CLI 工具](./wsl_ai_cli_教程)。
+Codex CLI 是 OpenAI 推出的终端编程 Agent，核心特色是通过 **`sandbox_mode`（沙箱权限）** 与 **`approval_policy`（审批策略）** 两个维度精细控制 AI 操作权限。安装方式见 [WSL 安装 AI CLI 工具](./wsl_ai_cli_教程)。
+
+> ⚠️ **版本变更说明**：早期版本的 `--approval-mode suggest/auto-edit/full-auto` 和 `codex.yaml` 已弃用，新版统一改为 `--sandbox`、`--ask-for-approval` 与 `~/.codex/config.toml`（项目规范文件改用 `AGENTS.md`）。
 
 ### 常用命令
 
 ```bash
-# 启动交互式会话
+# 启动交互式会话（支持 ChatGPT 账号登录或 API Key）
 codex
 
 # 单次任务描述
 codex "列出当前目录下所有大于 1MB 的文件，按大小排序"
 
-# 将文件内容作为输入
-codex "重构这个函数，减少嵌套层级，保持功能不变" < utils.py
+# 非交互执行（适合脚本/CI）
+codex exec "为 utils.py 补充单元测试并运行 pytest"
 
-# 指定模型（默认 o4-mini，o3 推理更强）
-codex --model o3 "分析这段代码的时间复杂度，给出最优解"
+# 指定模型
+codex --model gpt-5-codex "分析这段代码的时间复杂度，给出最优解"
 
-# 指定审批模式（见下方说明）
-codex --approval-mode suggest   "优化这个 SQL 查询"
-codex --approval-mode auto-edit "为所有函数添加 Python 类型注解"
-codex --approval-mode full-auto "运行测试并自动修复所有失败用例"
+# 指定沙箱模式（-s / --sandbox）
+codex --sandbox read-only "审查当前项目的安全风险"
+codex --sandbox workspace-write "为所有函数添加 Python 类型注解"
 
-# 指定工作目录
-codex --cwd /path/to/project "检查项目依赖有没有已知安全漏洞"
+# 指定审批策略（-a / --ask-for-approval）
+codex --ask-for-approval on-request "优化这个 SQL 查询"
+codex -a never -s workspace-write "运行测试并自动修复所有失败用例"
 
-# 静默模式（减少交互提示）
-codex --quiet "生成标准 README.md"
+# 内联覆盖配置项（-c / --config）
+codex -c approval_policy=never -c sandbox_mode=workspace-write "整理依赖"
+
+# 完全跳过沙箱与审批（仅限隔离容器/可信环境，慎用）
+codex --yolo
 ```
 
-### 审批模式详解
+### 沙箱与审批策略详解
 
-| 模式 | 文件修改 | 命令执行 | 适用场景 |
-|------|---------|---------|---------|
-| `suggest`（默认） | 只给建议，不执行 | 不执行 | 学习、代码评审 |
-| `auto-edit` | 自动修改文件 | 执行前需确认 | 日常开发，有安全兜底 |
-| `full-auto` | 全自动 | 全自动 | CI、脚本、测试修复 |
+| 维度 | 取值 | 行为说明 |
+|------|------|---------|
+| **`--sandbox` (`-s`)** | `read-only` | 只读，不能改文件也不能执行有副作用的命令 |
+| | `workspace-write` | 仅允许在当前项目工作区内读写与运行命令（保护 `.git` 等敏感目录） |
+| | `danger-full-access` | 关闭沙箱限制，拥有宿主机完整权限 |
+| **`--ask-for-approval` (`-a`)** | `on-request` | 仅在越界操作（如联网、修改工作区外文件）时请求确认 |
+| | `never` | 全程不弹窗确认，配合 `workspace-write` 适合自动化任务 |
 
-### 配置文件（codex.yaml）
+### 配置文件（`~/.codex/config.toml`）
 
-在项目根目录创建 `codex.yaml`：
+全局配置位于 `~/.codex/config.toml`（也支持项目级 `.codex/config.toml`），项目开发规范则写在根目录的 **`AGENTS.md`** 中：
 
-```yaml
-# 默认审批模式
-approvalMode: auto-edit
+```toml
+# ~/.codex/config.toml
+model = "gpt-5-codex"
+model_reasoning_effort = "medium"
 
-# 默认模型
-model: o4-mini
+# 沙箱模式：read-only | workspace-write | danger-full-access
+sandbox_mode = "workspace-write"
 
-# 项目上下文（会附加到每次请求）
-instructions: |
-  这是一个 Python 3.11 项目，使用 FastAPI 框架。
-  代码规范：类型注解全覆盖，black 格式化，ruff 检查。
-  测试用 pytest，覆盖率要求 80% 以上。
-
-# 沙箱策略（full-auto 时限制可执行的命令）
-sandbox:
-  allowedCommands:
-    - pytest
-    - ruff
-    - black
-    - git status
-    - git diff
+# 审批策略：on-request | never
+approval_policy = "on-request"
 ```
 
 ### 实用工作流
 
 ```bash
-# 自动修复测试失败
-codex --approval-mode full-auto "运行 pytest，修复所有失败的测试"
+# 自动修复测试失败（沙箱内免确认）
+codex -s workspace-write -a never "运行 pytest，修复所有失败的测试"
 
-# 代码审查 + 修复
-codex "对这次 git diff 做 code review，找出 Bug 并自动修复" <<< "$(git diff)"
+# 只读模式做代码审查（安全不改文件）
+codex -s read-only "对当前 git diff 做 code review，找出潜在 Bug 和安全隐患"
 
 # 迁移适配
-codex --approval-mode auto-edit \
+codex -s workspace-write -a on-request \
   "把所有 requests 库的调用改为 httpx 异步写法"
 
-# 安全扫描
-codex --approval-mode suggest \
-  "扫描整个项目，列出所有可能的 SQL 注入、XSS、硬编码密钥问题"
-
 # 文档生成
-codex --approval-mode auto-edit \
+codex -s workspace-write \
   "为 src/ 下所有没有 docstring 的公开函数生成文档字符串"
 ```
 
-## 费用参考（2025年）
+## 套餐与费用参考（2026 年 11 月）
 
-| 模型 | 输入（每百万 token） | 输出（每百万 token） |
-|------|---------------------|---------------------|
-| GPT-4o | $2.50 | $10.00 |
-| GPT-4o mini | $0.15 | $0.60 |
-| o3 | $10.00 | $40.00 |
+### ChatGPT 个人订阅
+- **Free**：$0/月，基础对话与轻量模型（有限额）
+- **Go**：$8/月，更高消息额度、文件上传与生图额度
+- **Plus**：$20/月，解锁高阶推理模型、深度研究、Codex 集成，无广告
+- **Pro**：$100 / $200 / $500/月，重度开发者与研究者多档位，高额度并附带 API 信用额度
 
-> 中文每个汉字约 1-2 个 token，1000 字约 ¥0.1-0.5（GPT-4o mini）。
+### OpenAI API 计费说明
+- API 按每百万 Token 分别计费（区分**普通输入 / 缓存命中输入 / 输出**，Prompt Caching 可显著降低重复上下文成本）。
+- 由于模型迭代与降价频繁，具体最新单价请直接查阅 [OpenAI Pricing 官方页](https://openai.com/api/pricing/)。

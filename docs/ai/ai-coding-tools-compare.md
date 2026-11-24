@@ -1,7 +1,7 @@
 ---
 title: AI 编程工具横评：Cursor vs GitHub Copilot vs Claude Code（2026）
 description: 个人开发者视角的 AI 编程助手深度对比，覆盖价格、功能、注册难度、封号风险，附国内外平台综合推荐方案
-date: 2026-05-31
+date: 2026-11-24
 order: 4
 tags: [Cursor, GitHub Copilot, Claude Code, AI编程, 对比]
 ---
@@ -16,26 +16,26 @@ tags: [Cursor, GitHub Copilot, Claude Code, AI编程, 对比]
 
 | 场景 | 推荐 |
 |------|------|
-| 想无脑开始、注册最简单 | **Cursor**（支付宝直接付款） |
-| 预算有限、C/Java/Python 日常补全 | **GitHub Copilot**（$10/月最便宜）|
-| 做复杂项目重构、Agent 自主编码 | **Claude Code**（能力天花板最高）|
+| 想开箱即用、追求最佳 IDE 交互体验 | **Cursor**（全代码库感知 + 多模型） |
+| 预算有限、跨 IDE 日常补全与多模型对话 | **GitHub Copilot**（Pro $10/月起，支持 Claude/GPT/Gemini）|
+| 做复杂项目重构、终端 Agent 自主编码 | **Claude Code**（能力天花板最高）|
 | 国内无 VPN 也能用 | **通义灵码 / 腾讯 CodeBuddy**（零门槛）|
-| 既要便宜又要强 | **Copilot + Claude Code 按需用** |
+| 既要便宜又要强 | **Copilot + Claude Code 按需组合** |
 
 ---
 
-## 一、价格与注册难度
+## 一、价格与注册难度（2026 年 11 月）
 
 ### 海外平台
 
 | 平台 | 免费版 | 个人付费版 | 支付方式 | 注册难度 | 封号风险 |
 |------|--------|-----------|---------|---------|---------|
-| **Cursor** | ✅ 限量补全+Agent | $20/月（Pro）| **支付宝/银联直付** ✅ | ⭐ 极简单 | 🟡 中等 |
-| **GitHub Copilot** | ✅ 2000补全+50对话/月 | $10/月（Pro）| 虚拟 Visa 卡 | ⭐⭐ 较简单 | 🟡 中等 |
-| **Claude Code** | ✅ 基础对话 | $20/月（Pro）| 虚拟 Visa 卡 / iOS 礼品卡 | ⭐⭐⭐⭐ 困难 | 🔴 最高 |
-| **OpenAI Codex** | ✅ 限量 | $20/月（Plus）| 虚拟 Visa 卡 | ⭐⭐⭐ 较难 | 🔴 较高 |
+| **Cursor** | ✅ 基础限量体验 | Plus/Pro $8–$30/月 · Super/Ultra $100–$200/月 | Visa/Mastercard（部分地区 Stripe 偶尔开放支付宝，视政策波动） | ⭐ 较简单 | 🟡 中等 |
+| **GitHub Copilot** | ✅ 限量补全+对话 | Pro $10/月 · Pro+ $39/月 · Max $100/月（AI Credit 制） | 境外卡 / 可用虚拟卡 | ⭐⭐ 较简单 | 🟡 中等 |
+| **Claude Code** | ✅ 基础对话 | Pro $20/月 · Max $100/月 · Ultra $200/月 | iOS 美区礼品卡（最稳）/ 美区虚拟卡 | ⭐⭐⭐⭐ 困难 | 🔴 最高 |
+| **OpenAI Codex** | ✅ 限量 | Plus $20/月 · Pro $100–$500/月 | iOS 礼品卡 / 美区虚拟卡 | ⭐⭐⭐ 较难 | 🔴 较高 |
 
-> ⭐ Cursor 是**唯一支持支付宝/银联直接支付**的海外 AI 编程工具，对国内用户极其友好。
+> ⚠️ 2025–2026 年间 Dupay、OneKey Card、WildCard 等老牌虚拟卡均已停服；Cursor 的支付宝通道也随 Stripe 区域合规政策有所波动，建议优先准备境外银行卡或参考[前置准备指南](./ai-account-prerequisites)选择当前可用支付方式。
 
 ### 国内平台（无需 VPN）
 
@@ -65,9 +65,9 @@ GitHub Copilot ≥ Cursor > Claude Code > 国内平台
 Claude Code >> Cursor ≈ Copilot > 国内平台
 ```
 
-- **Claude Code**：Claude Sonnet/Opus 驱动，代码理解和推理能力最强，200K 上下文窗口
-- **Cursor**：可切换 GPT-5 / Claude / Gemini，灵活性最高
-- **Copilot**：GPT-5 驱动，质量不错但不如 Claude
+- **Claude Code**：Claude Sonnet / Opus / Fable 驱动，代码理解和推理能力最强
+- **Cursor**：可自由切换 Claude / GPT / Gemini 等主流前沿模型，灵活性极高
+- **Copilot**：已全面支持多模型切换（Claude Sonnet/Opus、GPT、Gemini 等），按月度 AI Credit 扣减
 
 ### Agent / 自主编码能力
 
@@ -100,14 +100,13 @@ Claude Code > Cursor (Composer) > Copilot (Agent) > 国内平台
 
 **核心优势：**
 - 全代码库感知（把整个项目 index 化，任何文件都能参考上下文）
-- Composer：多文件同时编辑，生成 → 预览 diff → 一键应用
-- 模型可切换：GPT-5 / Claude Sonnet / Gemini，按任务选最合适的
-- 支付宝直接付款，国内用户注册最简单
+- Composer / Agent：多文件同时编辑，生成 → 预览 diff → 一键应用
+- 模型可切换：Claude / GPT / Gemini 按任务选最合适的
+- 邮箱或 Google 即可注册，上手成本低
 
 **主要缺点：**
 - 独立 IDE（VS Code fork），不支持 JetBrains
-- 设备限制严格，同时只能 1 台活跃
-- $20/月 Teams 价格不算低
+- 重度 Agent 任务消耗额度较快，高阶档位（Super/Ultra $100–$200/月）与 Teams（$30–$40+/人/月）价格不低
 
 **适合人群**：主用 VS Code，想要一套"开箱即用"的 AI 编程体验。
 
@@ -115,19 +114,18 @@ Claude Code > Cursor (Composer) > Copilot (Agent) > 国内平台
 
 ### GitHub Copilot
 
-**定位**：最成熟、覆盖最广的 AI 补全工具
+**定位**：最成熟、覆盖最广的 AI 编程助手
 
 **核心优势：**
-- $10/月，是主流工具里**最便宜**的
-- VS Code + JetBrains + Neovim 全覆盖
-- 行级补全全场最强，C 语言/嵌入式代码训练数据最丰富
-- GitHub 深度集成（PR Review、Issues 分析）
-- 免费版已相当好用（2000 次补全 + 50 次对话/月）
+- $10/月（Pro）起，是主流海外工具里**门槛最低**的（重度可选 Pro+ $39 / Max $100）
+- VS Code + JetBrains + Neovim + 全新独立 Copilot CLI 全覆盖
+- 支持多模型切换（Claude / GPT / Gemini），按月度 AI Credit 计费
+- 行级补全成熟稳定，C 语言/嵌入式代码训练数据丰富，且深度集成 GitHub PR/Issues
 
 **主要缺点：**
-- 支付需要虚拟 Visa 卡（需要 Dupay 等）
-- 独立 IDE 体验不如 Cursor
-- Agent 能力比 Cursor/Claude Code 弱
+- 支付需要境外卡或可用虚拟卡（注意 Dupay / OneKey 已停服）
+- 独立 IDE 交互体验不如 Cursor 原生重构流畅
+- 重度使用高阶模型时 AI Credit 消耗较快
 
 **适合人群**：预算有限的开发者，JetBrains 用户，嵌入式/C 语言开发者。
 
@@ -152,15 +150,13 @@ Claude Code > Cursor (Composer) > Copilot (Agent) > 国内平台
 
 ---
 
-## 四、2026 新入局者
+## 四、其他值得关注的 AI IDE
 
 ### Windsurf（原 Codeium）
 
-- 免费版很慷慨（无限补全），付费版 $15/月
-- 代码库感知和 Agent 能力接近 Cursor，但生态成熟度稍低
-- **国内用户注册简单**，支持邮箱注册，虚拟卡付款
-
-值得关注，可作为 Cursor 的替代选项。
+- 免费版提供无限 Tab 补全与轻量每日/每周配额；付费版改为配额制：**Pro $20/月、Max $200/月、Teams $40/人/月**（原 $15/月定价已上调）
+- Cascade Agent 与代码库感知能力接近 Cursor，适合作为 Cursor 的直接备选
+- **国内用户注册简单**，支持邮箱注册，需境外卡或可用虚拟卡付款
 
 ---
 
@@ -202,7 +198,7 @@ Cursor Pro $20/月（主力，日常写代码）
 
 ## 六、注册教程快速索引
 
-- Cursor：[cursor.com](https://cursor.com) → Sign Up → 邮箱/Google 注册 → **支付宝付款**（直接支持）
+- Cursor：[cursor.com](https://cursor.com) → Sign Up → 邮箱/Google 注册 → Visa/Mastercard（部分地区可能支持支付宝）
 - GitHub Copilot：注册 [github.com](https://github.com) → Settings → Copilot → 虚拟 Visa 卡订阅
 - Claude Code：见[前置准备](./ai-account-prerequisites) + [Claude 注册](./chatgpt-claude-gemini-register#二claude-注册与订阅)
 - 通义灵码：[lingma.aliyun.com](https://lingma.aliyun.com) → 手机号注册 → VS Code 安装插件

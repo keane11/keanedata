@@ -1,7 +1,7 @@
 ---
 title: Hermes Agent 完整配置指南
 description: Hermes Agent 部署指南：DeepSeek 主力 + 微信 Gateway + Gemini 备选，WSL2 环境完整配置
-date: 2026-05-13
+date: 2026-11-24
 tags: [AI, Agent, DeepSeek]
 order: 6
 ---
@@ -274,7 +274,7 @@ cd ~/ai/hermes
 
 ## 6. DeepSeek 配置
 
-### 5.1 通过向导配置（推荐）
+### 6.1 通过向导配置（推荐）
 
 ```bash
 hermes setup   # 完整初始化
@@ -289,10 +289,10 @@ hermes model
 | Provider | DeepSeek (direct API) |
 | API Key | 你的 DeepSeek API Key |
 | Base URL | `https://api.deepseek.com` |
-| 主力模型 | `deepseek-v4-pro` |
-| 轻量模型 | `deepseek-v4-flash`（低成本日常任务） |
+| 主力模型 | `deepseek-v4-pro`（纯文本强推理，1M 上下文） |
+| 轻量/视觉模型 | `deepseek-flash`（对应 V4.1-Flash，支持原生视觉与思考模式，性价比极高） |
 
-### 5.2 手动编辑 `.env`
+### 6.2 手动编辑 `.env`
 
 ```bash
 mkdir -p ~/.hermes
@@ -316,7 +316,7 @@ MESSAGING_CWD=/home/你的用户名
 
 > **常见错误**：`DEEPSEEK_API_KEY=Bearer sk-xxxx` 或 `DEEPSEEK_API_KEY="sk-xxxx"` 都是错的，不要带前缀和引号。
 
-### 5.3 验证 API Key
+### 6.3 验证 API Key
 
 ```bash
 set -a && source ~/.hermes/.env && set +a
@@ -333,9 +333,9 @@ curl -sS https://api.deepseek.com/chat/completions \
 
 ## 7. Gemini API 备选配置
 
-Gemini 作为 DeepSeek 的 fallback，图片 / OCR / 视觉任务优先走 Gemini。
+Gemini 作为 DeepSeek 的 fallback，图片 / OCR / 视觉任务优先走 Gemini（注：如果主力已切到 `deepseek-flash`，其本身也已具备原生视觉能力）。
 
-### 6.1 配置前备份
+### 7.1 配置前备份
 
 ```bash
 backup_dir=~/.hermes_backups/backup_$(date +%Y%m%d_%H%M%S)
@@ -344,7 +344,7 @@ cp -a ~/.hermes "$backup_dir"
 echo "备份保存到：$backup_dir"
 ```
 
-### 6.2 在 `.env` 中添加 Gemini Key
+### 7.2 在 `.env` 中添加 Gemini Key
 
 ```bash
 nano ~/.hermes/.env
@@ -357,11 +357,12 @@ nano ~/.hermes/.env
 GEMINI_API_KEY=AIzaSy-xxxxxxxxxxxxxxxxxxxx
 
 # Gemini 兼容 OpenAI 端点（部分 Hermes 版本使用）
+# 注意：gemini-2.0-flash 已于 2026-06-01 停服，请使用新一代稳定模型
 GEMINI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-3.8-flash
 ```
 
-### 6.3 配置 Fallback
+### 7.3 配置 Fallback
 
 ```bash
 hermes model           # 确认 DeepSeek 为主模型
@@ -381,13 +382,13 @@ vision_provider: gemini   # 图片任务默认走 Gemini
 
 配置 Hermes 输出真实文件（`.xlsx` / `.docx` / `.pdf`），而非纯文本：
 
-### 7.1 安装依赖
+### 8.1 安装依赖
 
 ```bash
 pip3 install openpyxl python-docx reportlab Pillow
 ```
 
-### 7.2 告知 Hermes 输出规范
+### 8.2 告知 Hermes 输出规范
 
 每次处理文档前加说明，或写入 Memory：
 
@@ -403,7 +404,7 @@ pip3 install openpyxl python-docx reportlab Pillow
 
 ## 9. 微信 Gateway
 
-### 8.1 配置 Gateway
+### 9.1 配置 Gateway
 
 ```bash
 hermes gateway setup
@@ -421,7 +422,7 @@ Use DM pairing approval（推荐）
 Only allow listed user IDs
 ```
 
-### 8.2 启动 Gateway
+### 9.2 启动 Gateway
 
 ```bash
 hermes gateway run
@@ -436,7 +437,7 @@ tmux new -s hermes-gateway 'hermes gateway run'
 tmux attach -t hermes-gateway
 ```
 
-### 8.3 添加白名单用户
+### 9.3 添加白名单用户
 
 日志出现 `Unauthorized user: xxxxx@im.wechat` 时：
 

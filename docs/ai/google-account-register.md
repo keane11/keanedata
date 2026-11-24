@@ -1,7 +1,7 @@
 ---
 title: Google 账号注册全流程（2026 最新）
 description: 中国大陆用户注册 Gmail / Google 账号完整教程，含手机 App 注册绕过验证、账号安全设置、注册后防封指南
-date: 2026-05-31
+date: 2026-11-24
 order: 2
 tags: [Google, Gmail, 注册教程, VPN]
 ---
@@ -10,7 +10,7 @@ tags: [Google, Gmail, 注册教程, VPN]
 
 > Gmail 是注册 ChatGPT、Claude、GitHub 等几乎所有海外平台的基础。先把 Google 账号搞定，后续一切都顺。
 
-**前置条件**：已准备好 VPN，节点选美国或日本。注册前请确认已关闭前一篇的[检查清单](./ai-account-prerequisites#五注册前完整检查清单)。
+**前置条件**：已准备好 VPN，节点选美国或日本。注册前请确认已完成前一篇的[检查清单](./ai-account-prerequisites#五注册前完整检查清单)。
 
 ---
 
@@ -62,10 +62,10 @@ tags: [Google, Gmail, 注册教程, VPN]
 
 **情况 B：+86 被拒，用接码平台**
 
-1. 打开 SMS-Activate，搜索 **"Google"** 或 **"Gmail"**
+1. 打开 HeroSMS（`hero-sms.com`）或 5sim（`5sim.net`），搜索 **"Google"** 或 **"Gmail"**（原 SMS-Activate 已于 2025 年底关停）
 2. 选美国/英国号码购买（约 $0.3–1）
 3. 将号码填入注册页面，选 **+1（美国）**
-4. 在 SMS-Activate 等待接收验证码（通常 30 秒内到）
+4. 在接码平台等待接收验证码（通常 30 秒内到）
 5. 填入验证码继续
 
 ### 第五步：完成注册

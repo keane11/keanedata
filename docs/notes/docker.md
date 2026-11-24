@@ -42,7 +42,7 @@ docker run -d \
   -v $(pwd)/data:/app/data \
   myapp:latest
 
-docker run --rm -it ubuntu:22.04 bash            # 临时交互容器，退出自动删除
+docker run --rm -it ubuntu:24.04 bash            # 临时交互容器，退出自动删除
 
 # 查看
 docker ps -a                                     # 所有容器
@@ -111,12 +111,12 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", 
 ### Node.js 应用示例
 
 ```dockerfile
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 
-FROM node:20-alpine
+FROM node:22-alpine
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY . .

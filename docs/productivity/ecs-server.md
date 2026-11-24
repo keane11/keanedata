@@ -1,7 +1,7 @@
 ---
 title: ECS 云服务器搭建及公网 IP 配置
 description: 阿里云 ECS 实例购买、安全组配置、公网 IP 绑定、域名解析到 Nginx 反向代理的完整实战教程。
-date: 2026-05-18
+date: 2026-11-24
 tags: [ECS, 云服务器, 运维, Nginx]
 order: 1
 ---
@@ -89,7 +89,7 @@ order: 1
 
 - **地域**：选华东（上海）或华北（北京），延迟低
 - **规格**：入门推荐 `ecs.t6-c1m2.large`（2 vCPU / 2 GiB）
-- **镜像**：Ubuntu 22.04 LTS（推荐）或 CentOS 7
+- **镜像**：Ubuntu 24.04 LTS（推荐）或 Ubuntu 22.04 LTS（⚠️ CentOS 7 已于 2024 年 6 月停止维护，切勿新装）
 - **系统盘**：40 GiB 高效云盘足够入门
 - **带宽**：按固定带宽 1 Mbps 即可（后续可升）
 
@@ -431,8 +431,8 @@ docker compose logs --tail=50
 ### 12.2 netdata 一键监控
 
 ```bash
-# 一键安装（约 2 分钟）
-bash <(curl -Ss https://my-netdata.io/kickstart.sh)
+# 一键安装（约 2 分钟，官方新地址 get.netdata.cloud）
+wget -O /tmp/netdata-kickstart.sh https://get.netdata.cloud/kickstart.sh && sh /tmp/netdata-kickstart.sh
 
 # 默认监听 19999 端口，只在内网可访问
 # 本地 ssh 端口转发访问

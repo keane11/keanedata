@@ -32,4 +32,5 @@ title: index
 ## 方法论
 
 - [提示词工程](./prompt) — 写好 Prompt 的方法论与常用模板
-- [HARNESS WorkFlow](./HARNESS_WorkFlow) - 围绕 AI Agent 构建约束机制、反馈回路、工作流控制和持续改进循环的系统工程实践。
+- [HARNESS WorkFlow](./HARNESS_WorkFlow) — 围绕 AI Agent 构建约束机制、反馈回路、工作流控制和持续改进循环的系统工程实践
+- [产品选型 Agent 架构指南](./agent_architecture) — 用 PydanticAI + SQLite + 本地文档搭建垂直领域智能选型 Agent 与四层防幻觉机制

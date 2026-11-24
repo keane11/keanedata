@@ -1,14 +1,14 @@
 ---
 title: CC Switch 切换国产模型
 description: Claude Code 通过 CC Switch 切换 DeepSeek 等国产大模型的完整配置流程
-date: 2026-05-13
+date: 2026-11-24
 tags: [Claude Code, AI]
 order: 5
 ---
 
-# CC Switch 与 Claude Code使用deepseek模型
+# CC Switch 与 Claude Code 使用 DeepSeek 模型
 
-本文档记录在 **Windows + WSL Ubuntu-22.04** 环境下安装 **CC Switch**，并通过 CC Switch 给 **Claude Code CLI** 切换到国产大模型，例如 DeepSeek API 的完整流程。
+本文档记录在 **Windows + WSL Ubuntu** 环境下安装 **CC Switch**，并通过 CC Switch 给 **Claude Code CLI** 切换到国产大模型（以 DeepSeek API 为例）的完整流程。
 
 > 适用场景：Claude Code CLI 安装在 WSL Ubuntu 中，平时在 WSL 终端里执行 `claude`。
 
@@ -22,14 +22,14 @@ order: 5
 Windows PowerShell 进入 WSL：
 wsl
 
-WSL 路径：
-/mnt/c/Users/11787/Downloads
+WSL 路径（将 <你的Windows用户名> 替换为实际用户名）：
+/mnt/c/Users/<你的Windows用户名>/Downloads
 
 WSL 用户：
 keane
 
 Ubuntu：
-Ubuntu-22.04
+Ubuntu-22.04 / Ubuntu-24.04
 ```
 
 Claude Code 如果是在 WSL 里运行，那么它读取的是 WSL 用户目录下的配置：
@@ -41,7 +41,7 @@ Claude Code 如果是在 WSL 里运行，那么它读取的是 WSL 用户目录�
 不要和 Windows 用户目录混淆：
 
 ```text
-C:\Users\11787\.claude\
+C:\Users\<你的Windows用户名>\.claude\
 ```
 
 如果 Claude Code 是在 WSL 里跑，建议 CC Switch 也安装到 WSL 里，否则 Windows 版 CC Switch 可能只修改 Windows 目录下的配置，导致 WSL 里的 `claude` 不生效。
@@ -50,39 +50,40 @@ C:\Users\11787\.claude\
 
 ## 2. 下载 CC Switch Linux 安装包
 
-进入 Windows 下载目录对应的 WSL 路径：
+进入下载目录（也可直接下载到 WSL 主目录 `~/Downloads`）：
 
 ```bash
-cd /mnt/c/Users/11787/Downloads
+cd /mnt/c/Users/<你的Windows用户名>/Downloads
 ```
 
-下载 Linux x86_64 的 `.deb` 包：
+下载 Linux x86_64 的 `.deb` 包（CC Switch 持续迭代，最新版本号请先查看 [GitHub Releases](https://github.com/farion1231/cc-switch/releases)，以下以 `v4.0.37` 为例）：
 
 ```bash
-curl -L -o CC-Switch-v3.14.1-Linux-x86_64.deb \
-https://github.com/farion1231/cc-switch/releases/download/v3.14.1/CC-Switch-v3.14.1-Linux-x86_64.deb
+VER="v4.0.37"
+curl -fL -o "CC-Switch-${VER}-Linux-x86_64.deb" \
+  "https://github.com/farion1231/cc-switch/releases/download/${VER}/CC-Switch-${VER}-Linux-x86_64.deb"
 ```
 
 检查文件是否正常：
 
 ```bash
-ls -lh CC-Switch-v3.14.1-Linux-x86_64.deb
-file CC-Switch-v3.14.1-Linux-x86_64.deb
+ls -lh "CC-Switch-${VER}-Linux-x86_64.deb"
+file "CC-Switch-${VER}-Linux-x86_64.deb"
 ```
 
 正常情况下应类似：
 
 ```text
--rwxrwxrwx 1 keane keane 12M May  9 17:24 CC-Switch-v3.14.1-Linux-x86_64.deb
-CC-Switch-v3.14.1-Linux-x86_64.deb: Debian binary package
+-rwxrwxrwx 1 keane keane 12M ... CC-Switch-v4.0.37-Linux-x86_64.deb
+CC-Switch-v4.0.37-Linux-x86_64.deb: Debian binary package
 ```
 
-如果下载出来只有几字节，例如 9 字节，说明下载错了文件名或 GitHub 链接没有真正下载到安装包。
+如果下载出来只有几字节，例如 9 字节，说明下载错了文件名或 GitHub 链接没有真正下载到安装包（加上 `curl -f` 可在 404 时直接报错）。
 
 错误示例：
 
 ```text
--rwxrwxrwx 1 keane keane 9 May  9 17:22 CC-Switch-v3.14.1-Linux.deb
+CC-Switch-v4.0.37-Linux.deb     # 缺少架构字段
 ```
 
 这种文件不能安装，会出现：
@@ -95,7 +96,7 @@ E: could not locate member control.tar
 正确文件名应带架构字段：
 
 ```text
-CC-Switch-v3.14.1-Linux-x86_64.deb
+CC-Switch-v4.0.37-Linux-x86_64.deb
 ```
 
 ---
@@ -105,7 +106,7 @@ CC-Switch-v3.14.1-Linux-x86_64.deb
 执行：
 
 ```bash
-sudo apt install ./CC-Switch-v3.14.1-Linux-x86_64.deb
+sudo apt install "./CC-Switch-${VER}-Linux-x86_64.deb"
 ```
 
 如果系统提示需要安装很多依赖，输入：
@@ -119,7 +120,7 @@ Y
 看到类似下面内容，说明安装成功：
 
 ```text
-Setting up cc-switch (3.14.1) ...
+Setting up cc-switch (4.0.37) ...
 ```
 
 检查安装位置：
@@ -256,10 +257,10 @@ Sonnet Model：
 deepseek-v4-pro[1m]
 
 Haiku Model：
-deepseek-v4-flash
+deepseek-flash
 
 Subagent Model：
-deepseek-v4-flash
+deepseek-flash
 
 Effort Level：
 max
@@ -437,8 +438,8 @@ export ANTHROPIC_AUTH_TOKEN="你的DeepSeek API Key"
 export ANTHROPIC_MODEL="deepseek-v4-pro[1m]"
 export ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-v4-pro[1m]"
 export ANTHROPIC_DEFAULT_SONNET_MODEL="deepseek-v4-pro[1m]"
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-v4-flash"
-export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-v4-flash"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-flash"
+export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-flash"
 export CLAUDE_CODE_EFFORT_LEVEL="max"
 ```
 
@@ -498,23 +499,23 @@ Claude Official
 错误文件名：
 
 ```text
-CC-Switch-v3.14.1-Linux.deb
+CC-Switch-v4.0.37-Linux.deb
 ```
 
 正确文件名：
 
 ```text
-CC-Switch-v3.14.1-Linux-x86_64.deb
+CC-Switch-v4.0.37-Linux-x86_64.deb
 ```
 
-重新下载：
+重新下载（请替换为 [Releases 页面](https://github.com/farion1231/cc-switch/releases) 的最新版本号）：
 
 ```bash
-rm -f CC-Switch-v3.14.1-Linux.deb
-rm -f CC-Switch-v3.14.1-Linux-x86_64.deb
+VER="v4.0.37"
+rm -f CC-Switch-*.deb
 
-curl -L -o CC-Switch-v3.14.1-Linux-x86_64.deb \
-https://github.com/farion1231/cc-switch/releases/download/v3.14.1/CC-Switch-v3.14.1-Linux-x86_64.deb
+curl -fL -o "CC-Switch-${VER}-Linux-x86_64.deb" \
+  "https://github.com/farion1231/cc-switch/releases/download/${VER}/CC-Switch-${VER}-Linux-x86_64.deb"
 ```
 
 ### 13.2 安装时报 Invalid archive signature
@@ -524,8 +525,8 @@ https://github.com/farion1231/cc-switch/releases/download/v3.14.1/CC-Switch-v3.1
 检查：
 
 ```bash
-ls -lh CC-Switch-v3.14.1-Linux-x86_64.deb
-file CC-Switch-v3.14.1-Linux-x86_64.deb
+ls -lh "CC-Switch-${VER}-Linux-x86_64.deb"
+file "CC-Switch-${VER}-Linux-x86_64.deb"
 ```
 
 正常应显示：
@@ -553,7 +554,7 @@ env | grep -E "ANTHROPIC|CLAUDE_CODE"
 如果 Windows 版 CC Switch 修改的是：
 
 ```text
-C:\Users\11787\.claude\
+C:\Users\<你的Windows用户名>\.claude\
 ```
 
 而你的 Claude Code 实际读取的是：
@@ -586,8 +587,8 @@ export ANTHROPIC_AUTH_TOKEN="你的DeepSeek API Key"
 export ANTHROPIC_MODEL="deepseek-v4-pro[1m]"
 export ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-v4-pro[1m]"
 export ANTHROPIC_DEFAULT_SONNET_MODEL="deepseek-v4-pro[1m]"
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-v4-flash"
-export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-v4-flash"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-flash"
+export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-flash"
 export CLAUDE_CODE_EFFORT_LEVEL="max"
 claude
 ```
@@ -655,12 +656,13 @@ chmod +x use-deepseek.sh use-claude-official.sh
 安装：
 
 ```bash
-cd /mnt/c/Users/11787/Downloads
+cd /mnt/c/Users/<你的Windows用户名>/Downloads
 
-curl -L -o CC-Switch-v3.14.1-Linux-x86_64.deb \
-https://github.com/farion1231/cc-switch/releases/download/v3.14.1/CC-Switch-v3.14.1-Linux-x86_64.deb
+VER="v4.0.37"   # 请查看 GitHub Releases 替换为最新版本
+curl -fL -o "CC-Switch-${VER}-Linux-x86_64.deb" \
+  "https://github.com/farion1231/cc-switch/releases/download/${VER}/CC-Switch-${VER}-Linux-x86_64.deb"
 
-sudo apt install ./CC-Switch-v3.14.1-Linux-x86_64.deb
+sudo apt install "./CC-Switch-${VER}-Linux-x86_64.deb"
 ```
 
 启动：

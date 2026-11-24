@@ -1,7 +1,7 @@
 ---
 title: KVM VPS 完整部署指南：系统初始化 + 3X-UI 多用户节点
 description: 从 VPS 选购、系统初始化、安全加固，到 WireGuard / 3X-UI 多用户 VLESS+Reality 节点部署的完整实战记录
-date: 2026-05-28
+date: 2026-11-24
 order: 10
 tags: [VPS, 3X-UI, VLESS, Reality, 多用户, 节点]
 ---
@@ -57,7 +57,7 @@ tags: [VPS, 3X-UI, VLESS, Reality, 多用户, 节点]
 | 带宽 | 1 Gbps |
 | IP | 1 个独立 IPv4 |
 | 机房 | 洛杉矶 DC03（国内延迟低） |
-| 系统 | Ubuntu 22.04 64位 |
+| 系统 | Ubuntu 24.04 LTS（推荐）或 Ubuntu 22.04 LTS 64位 |
 | 价格 | **$59.99/年** |
 
 ### 选购要点
@@ -192,7 +192,7 @@ type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh root@你的服务器IP "mkdir -p
 
 ```bash
 apt install wireguard -y
-wget https://git.io/wireguard -O wireguard-install.sh
+curl -O https://raw.githubusercontent.com/angristan/wireguard-install/master/wireguard-install.sh
 chmod +x wireguard-install.sh
 bash wireguard-install.sh
 ```
@@ -246,7 +246,7 @@ ufw allow 443/tcp
 
 > 适合**多人共享**（家人 + 朋友）。图形化面板，支持独立账号、流量统计、限额/限时管理。
 >
-> **版本说明**：本节基于 **3X-UI v3.2.0**（2026 年）实际界面编写，与旧版（2.x）有差异，踩坑修复均来自真实部署。
+> **版本说明**：本节基于 **3X-UI v3.2.0** 实操界面编写（截至 2026 年 11 月已迭代至 v3.11.x，v3.x 系列核心交互一致），与旧版（2.x）有差异，踩坑修复均来自真实部署。
 
 ### 8.1 适用场景
 
@@ -831,7 +831,7 @@ http://127.0.0.1:8888/你的路径/
 ### 9.1 装 Node.js（用 nvm）
 
 ```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh | bash
 source ~/.bashrc
 nvm install --lts
 nvm use --lts
@@ -847,10 +847,13 @@ systemctl start docker
 docker --version
 ```
 
-### 9.3 全局安装 Agent 工具
+### 9.3 安装 Agent 工具（Claude Code 原生安装器）
 
 ```bash
-npm install -g @anthropic-ai/claude-code
+# Anthropic 已弃用 npm 全局安装，统一改用官方原生安装器
+curl -fsSL https://claude.ai/install.sh | bash
+source ~/.bashrc
+claude --version
 ```
 
 ### 9.4 配置 API Key
@@ -985,4 +988,4 @@ curl ip.sb                # 当前出口 IP
 
 ---
 
-*配套文档：[DeepSeek TUI / CodeWhale WSL 安装指南](./deepseek-tui-wsl) — VPS 上部署 AI CLI 工具*
+*配套文档：[DeepSeek TUI / CodeWhale WSL 安装指南](/ai/deepseek-tui-wsl) — VPS / WSL 上部署 AI CLI 工具*

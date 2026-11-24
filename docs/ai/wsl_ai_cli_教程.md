@@ -1,7 +1,7 @@
 ---
 title: WSL 安装 AI CLI 工具完整教程
 description: Windows WSL2 + Ubuntu 环境下安装 Claude Code、Codex CLI、Antigravity CLI（原 Gemini CLI）完整教程
-date: 2026-04-21
+date: 2026-11-24
 tags: [WSL, CLI, AI]
 order: 4
 ---
@@ -10,7 +10,7 @@ order: 4
 
 > 适用环境：Windows 10 (2004+) / Windows 11 + WSL 2 + Ubuntu 24.04 LTS  
 > 涵盖工具：Claude Code · OpenAI Codex CLI · Antigravity CLI（原 Gemini CLI）· GitHub Copilot CLI  
-> 更新日期：2026-06-16
+> 更新日期：2026-11-24
 
 ---
 
@@ -20,7 +20,7 @@ order: 4
 2. [启用 WSL 2](#2-启用-wsl-2)
 3. [安装 Ubuntu](#3-安装-ubuntu)
 4. [初始化 Ubuntu 环境](#4-初始化-ubuntu-环境)
-5. [安装 Node.js（所有 CLI 的依赖）](#5-安装-nodejs所有-cli-的依赖)
+5. [安装 Node.js（Codex / Copilot CLI 依赖）](#5-安装-nodejscodex--copilot-cli-依赖)
 6. [Claude Code（Anthropic）](#6-claude-codeanthropic)
 7. [Codex CLI（OpenAI）](#7-codex-cliopenai)
 8. [Antigravity CLI（Google，接替 Gemini CLI）](#8-antigravity-cligoogle接替-gemini-cli)
@@ -151,18 +151,18 @@ wsl --shutdown
 
 ---
 
-## 5. 安装 Node.js（所有 CLI 的依赖）
+## 5. 安装 Node.js（Codex / Copilot CLI 依赖）
 
-Claude Code、Codex CLI、GitHub Copilot CLI 均基于 Node.js，建议用 **nvm** 管理版本。（Antigravity CLI 是 Go 编译的独立二进制，不依赖 Node，可跳过本步骤单独安装。）
+Codex CLI 与新版 GitHub Copilot CLI（`@github/copilot`）基于 Node.js，建议用 **nvm** 管理版本。（**Claude Code** 与 **Antigravity CLI** 现均提供官方独立原生二进制安装器，不依赖 Node.js，可跳过本步骤直接安装。）
 
 ```bash
-# 安装 nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+# 安装 nvm（最新稳定版 v0.41.0）
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh | bash
 
 # 重载 Shell
 source ~/.bashrc
 
-# 安装最新 LTS 版本
+# 安装最新 LTS 版本（Node 22/24 LTS，注意 Node 20 已于 2026-04 EOL）
 nvm install --lts
 nvm use --lts
 nvm alias default node
@@ -178,16 +178,20 @@ npm --version
 
 Claude Code 是 Anthropic 官方 CLI，支持代码编写、调试、文件操作及多步骤任务执行，可直接读写项目文件并执行终端命令。
 
-### 安装
+### 安装（官方原生安装器）
+
+> ⚠️ **重要变更**：Anthropic 已官方弃用 `npm install -g @anthropic-ai/claude-code` 全局安装方式，请统一使用下方独立原生二进制安装器（无需 Node.js，启动更快且支持自动更新）。如之前用 npm 装过，可先执行 `npm uninstall -g @anthropic-ai/claude-code`。
 
 ```bash
-npm install -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
+source ~/.bashrc
 claude --version
+claude doctor
 ```
 
-### 配置 API Key
+### 配置认证 / API Key
 
-前往 [console.anthropic.com](https://console.anthropic.com) 获取 API Key：
+支持直接运行 `claude` 通过 Claude Pro / Max / Ultra 账号 OAuth 登录，或前往 [console.anthropic.com](https://console.anthropic.com) 获取 API Key：
 
 ```bash
 echo 'export ANTHROPIC_API_KEY="sk-ant-xxxxxxxx"' >> ~/.bashrc
@@ -219,7 +223,7 @@ claude --resume <session-id>
 claude --print "生成一份 .gitignore 模板"
 
 # 指定模型
-claude --model claude-opus-4-7 "帮我做代码审查"
+claude --model opus "帮我做代码审查"
 
 # 允许所有文件操作（跳过逐步确认）
 claude --dangerously-skip-permissions
@@ -266,50 +270,54 @@ source ~/.bashrc
 
 ### 常用命令
 
+> ⚠️ 旧版 `--approval-mode suggest/auto-edit/full-auto` 已弃用，新版通过 `--sandbox`（`-s`）和 `--ask-for-approval`（`-a`）分别控制沙箱范围与审批策略，配置保存在 `~/.codex/config.toml`。
+
 ```bash
-# 启动交互式会话
+# 启动交互式会话（支持 ChatGPT 账号登录或 OPENAI_API_KEY）
 codex
 
 # 单次任务描述
 codex "列出当前目录下所有大于 1MB 的文件"
 
-# 将文件内容作为输入
-codex "重构这个函数，减少嵌套层级" < utils.py
+# 非交互脚本模式
+codex exec "为 utils.py 补充单元测试并运行"
 
-# 指定模型（默认 o4-mini）
-codex --model o3 "分析这段代码的时间复杂度"
+# 指定模型
+codex --model gpt-5-codex "分析这段代码的时间复杂度"
 
-# 指定审批模式
-codex --approval-mode suggest "优化数据库查询语句"
-codex --approval-mode auto-edit "为所有函数添加类型注解"
-codex --approval-mode full-auto "运行测试并自动修复所有失败用例"
+# 指定沙箱模式与审批策略
+codex -s read-only "审查当前项目的安全风险"
+codex -s workspace-write -a on-request "为所有函数添加类型注解"
+codex -s workspace-write -a never "运行测试并自动修复所有失败用例"
 
-# 指定工作目录
-codex --cwd /path/to/project "检查项目依赖是否有安全漏洞"
+# 内联覆盖配置项
+codex -c approval_policy=never -c sandbox_mode=workspace-write "优化数据库查询语句"
 
-# 静默模式（减少交互提示）
-codex --quiet "生成 README.md"
+# 跳过全部沙箱与确认（仅限隔离环境，慎用）
+codex --yolo
 
 # 查看帮助
 codex --help
 ```
 
-### 审批模式说明
+### 沙箱与审批策略说明
 
-| 模式 | 行为 | 适用场景 |
-|------|------|---------|
-| `suggest`（默认） | 只给出建议，不自动执行 | 学习、探索 |
-| `auto-edit` | 自动修改文件，执行命令前需确认 | 日常开发 |
-| `full-auto` | 全自动执行，无需确认 | CI/脚本环境 |
+| 参数 | 选项 | 行为 | 适用场景 |
+|------|------|------|---------|
+| `--sandbox` (`-s`) | `read-only` | 只读，不改文件也不执行副作用命令 | 学习、代码评审 |
+| | `workspace-write` | 仅允许在当前工作区内读写和执行 | 日常开发 |
+| | `danger-full-access` | 无沙箱限制 | 受控隔离环境 |
+| `--ask-for-approval` (`-a`) | `on-request` | 越界操作前请求人工确认 | 日常开发 |
+| | `never` | 全程不弹窗确认 | CI/自动化脚本 |
 
 ---
 
 ## 8. Antigravity CLI（Google，接替 Gemini CLI）
 
-::: danger 重要变更（2026-06）
-Google 将于 **2026 年 6 月 18 日**停止向个人用户（Google AI Pro / Ultra 及免费版 Gemini Code Assist）提供旧版 **Gemini CLI**（`@google/gemini-cli`），由新一代 **Antigravity CLI**（命令 `agy`）接替。
+::: danger 重要变更（2026-06 已生效）
+Google 已于 **2026 年 6 月 18 日**正式停止向个人用户（Google AI Pro / Ultra 及免费版 Gemini Code Assist）提供旧版 **Gemini CLI**（`@google/gemini-cli`），由新一代 **Antigravity CLI**（命令 `agy`）接替。
 
-- **受影响**：用 Google 账号免费登录或个人订阅的用户——6/18 后旧版 `gemini` 将无法调用，请尽快迁移。
+- **受影响**：用 Google 账号免费登录或个人订阅的用户——旧版 `gemini` 已无法调用，请迁移至 `agy`。
 - **不受影响**：企业版授权用户，以及使用**付费 Gemini API Key** 认证的用户，仍可继续使用旧版 Gemini CLI。
 
 Antigravity CLI 是 Google 基于 Antigravity 平台推出的新一代终端 AI 助手。与旧版不同，它是 **Go 编译的独立二进制**，不再依赖 Node.js，启动更快，并支持多 Agent 协作。
@@ -392,94 +400,46 @@ agy --help
 
 ## 9. GitHub Copilot CLI
 
-GitHub Copilot CLI 以 `gh` 扩展形式提供，专注于 Shell 命令生成与解释，深度集成 GitHub 工作流。
+::: danger 重要变更（旧版 gh-copilot 扩展已退役）
+旧版 `gh extension install github/gh-copilot`（以及 `gh copilot suggest` / `gh copilot explain` 命令）已于 **2025 年 10 月 25 日**正式停止服务。GitHub 现已推出全新的独立 Agent 版 **GitHub Copilot CLI**（命令为 `copilot`），支持项目级规划、编码、调试与命令执行。
+:::
 
-### 安装 gh CLI
-
-```bash
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-  | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
-  https://cli.github.com/packages stable main" \
-  | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-sudo apt update && sudo apt install -y gh
-```
-
-### 登录 GitHub 账号
+### 安装独立版 GitHub Copilot CLI
 
 ```bash
-gh auth login
-# 选择：GitHub.com → HTTPS → 浏览器认证
+# 方式一：通过 npm 全局安装（WSL 推荐）
+npm install -g @github/copilot
+
+# 方式二：通过 Homebrew 安装（如 WSL 已装 Homebrew）
+brew install github/copilot/copilot
+
+# 验证安装
+copilot --version
 ```
 
-### 安装 Copilot 扩展
+> 如之前装过已废弃的旧扩展，可清理卸载：`gh extension remove gh-copilot`。
 
-```bash
-gh extension install github/gh-copilot
-gh copilot --version
-```
+### 登录认证
+
+首次在终端运行 `copilot`，按提示使用 GitHub 账号完成浏览器 OAuth 授权登录即可（需账号开通 GitHub Copilot Free / Pro / Pro+ / Business / Enterprise）。
 
 ### 常用命令
 
-GitHub Copilot CLI 提供两个核心子命令：`suggest` 和 `explain`。
-
-#### `gh copilot suggest`：自然语言生成命令
-
 ```bash
-# 生成 Shell 命令
-gh copilot suggest "递归查找并删除所有 .log 文件"
-gh copilot suggest "找出占用 8080 端口的进程并杀掉"
-gh copilot suggest "统计当前目录下每种文件类型的数量"
-gh copilot suggest "将目录下所有 .jpg 文件批量转换为 .png"
-gh copilot suggest "监控某个文件的实时变化"
+# 启动交互式 Agent 会话（在项目目录下运行）
+cd my-project && copilot
 
-# 生成 Git 命令
-gh copilot suggest -t git "撤销最近三次提交但保留文件改动"
-gh copilot suggest -t git "把当前分支的某个提交摘到另一个分支"
-gh copilot suggest -t git "查看两个分支之间的文件差异"
-gh copilot suggest -t git "清理所有已合并的本地分支"
-gh copilot suggest -t git "修改最近一次提交的信息"
+# 非交互单次任务（-p / --prompt）
+copilot -p "修复当前目录下失败的单元测试"
+copilot -p "列出当前目录下所有大于 1MB 的文件并按大小排序"
+copilot -p "解释 find . -name '*.py' -exec sed -i 's/foo/bar/g' {} + 这条命令的含义"
+copilot -p "根据当前 git diff 生成一条规范的 commit message"
 
-# 生成 gh 命令
-gh copilot suggest -t gh "列出我所有未合并的 PR"
-gh copilot suggest -t gh "把某个 Issue 分配给指定用户"
-gh copilot suggest -t gh "下载某次 Actions 运行的产物"
-gh copilot suggest -t gh "创建一个草稿 PR"
+# 查看全部参数与子命令
+copilot --help
 ```
 
-#### `gh copilot explain`：解释命令含义
-
-```bash
-# 解释复杂的 Shell 命令
-gh copilot explain "find . -name '*.py' -exec sed -i 's/foo/bar/g' {} +"
-gh copilot explain "awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -10"
-gh copilot explain "tar -czvf archive.tar.gz --exclude='node_modules' ."
-gh copilot explain "lsof -i :3000"
-gh copilot explain "ps aux | grep '[n]ode'"
-
-# 解释 Git 命令
-gh copilot explain "git rebase -i HEAD~3"
-gh copilot explain "git reflog"
-gh copilot explain "git stash pop"
-gh copilot explain "git bisect start"
-
-# 解释权限和系统命令
-gh copilot explain "chmod 755"
-gh copilot explain "chown -R www-data:www-data /var/www"
-gh copilot explain "sudo systemctl enable --now nginx"
-```
-
-### 设置快捷别名（推荐）
-
-```bash
-echo 'alias ghcs="gh copilot suggest"' >> ~/.bashrc
-echo 'alias ghce="gh copilot explain"' >> ~/.bashrc
-source ~/.bashrc
-
-# 使用示例
-ghcs "压缩当前目录，排除 .git 和 node_modules"
-ghce "grep -rn --include='*.js' 'TODO' ."
-```
+> 新版 Copilot CLI 不再局限于单条 Shell 命令翻译，而是与 Claude Code / Codex 同级的终端编程 Agent，并且可以在会话中按需切换支持的模型（Claude / GPT / Gemini 等）。
 
 ---
 
@@ -496,7 +456,7 @@ ghce "grep -rn --include='*.js' 'TODO' ."
 export ANTHROPIC_API_KEY="sk-ant-xxxxxxxx"
 export OPENAI_API_KEY="sk-xxxxxxxx"
 export ANTIGRAVITY_API_KEY="AIzaxxxxxxxx"   # Antigravity CLI（原 Gemini CLI）
-# GitHub Copilot 通过 gh auth login 管理，无需手动配置
+# GitHub Copilot CLI 通过首次运行 copilot 登录授权，无需手动配 Key
 ```
 
 ### 工具选择参考
@@ -504,9 +464,9 @@ export ANTIGRAVITY_API_KEY="AIzaxxxxxxxx"   # Antigravity CLI（原 Gemini CLI�
 | 使用场景 | 推荐工具 |
 |---------|---------|
 | 复杂多步骤编程任务、文件级操作 | Claude Code |
-| 代码自动重构、全自动任务执行 | Codex CLI |
+| 代码自动重构、沙箱化全自动任务 | Codex CLI |
 | 大型代码库分析、超长文档处理 | Antigravity CLI（原 Gemini CLI） |
-| Shell 命令生成与解释、Git 操作 | GitHub Copilot CLI |
+| GitHub 生态深度联动、多模型终端 Agent | GitHub Copilot CLI |
 
 ### 一键验证所有工具
 
@@ -515,7 +475,7 @@ echo "=== AI CLI 环境检查 ===" && \
 printf "Claude Code : " && claude --version 2>/dev/null || echo "未安装" && \
 printf "Codex CLI   : " && codex --version 2>/dev/null || echo "未安装" && \
 printf "Antigravity : " && agy --version 2>/dev/null || echo "未安装" && \
-printf "gh Copilot  : " && gh copilot --version 2>/dev/null || echo "未安装"
+printf "Copilot CLI : " && copilot --version 2>/dev/null || echo "未安装"
 ```
 
 ---

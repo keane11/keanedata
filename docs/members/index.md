@@ -1,8 +1,11 @@
 ---
 title: AI 副业实战营 · 学员路线图
 description: 学员专属内容入口，按模块顺序学习
-date: 2026-05-31
-hidden: true
+date: 2026-11-24
+head:
+  - - meta
+    - name: robots
+      content: noindex, nofollow
 ---
 
 # 🎓 AI 副业实战营 · 学员路线图
@@ -17,10 +20,10 @@ hidden: true
 
 - [ ] **[前置准备：VPN · 接码 · 虚拟信用卡](/ai/ai-account-prerequisites)**
   - VPN 节点选择和 IP 纯净度检测
-  - SMS-Activate 接码平台操作
-  - Dupay 虚拟信用卡申请
-  - iOS 美区 Apple ID 注册（全流程）
+  - HeroSMS / 5sim 等接码平台操作
+  - iOS 美区 Apple ID 注册 + 礼品卡订阅（最稳）
   - iOS 土区 Apple ID 转区（省 45%）
+  - 虚拟信用卡现状与替代方案（附避坑指南）
 
 - [ ] **[Google 账号注册全流程](/ai/google-account-register)**
   - 手机 App 注册成功率最高的方法

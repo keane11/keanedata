@@ -1,7 +1,7 @@
 ---
 title: 工具箱
-description: 常用开发工具集合：QR 码生成、Hash 计算、Prompt 构建、Base64 编解码、JSON 格式化、时间戳转换
-date: 2026-05-13
+description: 常用开发与 AI 工具集合：QR 码生成、Hash 计算、Prompt 构建、网文 Prompt 生成、Base64 编解码、JSON 格式化、时间戳转换与文件共享
+date: 2026-11-24
 ---
 
 # 工具箱
@@ -23,6 +23,7 @@ date: 2026-05-13
 | 工具 | 功能 |
 |------|------|
 | [Prompt 构建器](./prompt) | 结构化 Prompt 生成，内置代码/翻译/写作/分析四种模板 |
+| [网文 Prompt 生成器](./novel-prompt) | 针对中文网文题材定制的五步法 Prompt 快速生成器 |
 
 ## 服务
 

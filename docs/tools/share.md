@@ -52,5 +52,4 @@ share.keaneai.top
 
 ## 相关文档
 
-- [QR 文件共享项目介绍](/projects/qr-file-share) — 项目功能与部署说明
-- [QR 共享文件夹设计方案](/projects/qr_file_design) — 详细技术设计文档
+- [QR 共享文件夹设计方案](/projects/qr_file_design) — UI 交互、目录结构与接口设计文档
